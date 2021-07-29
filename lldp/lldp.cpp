@@ -28,6 +28,59 @@ using namespace std;
 int main()
 {
     std::cout << "Hello World!\n";
+	SimLog::logFile << endl;
+	SimLog::Debug = 8; // 6 9
+
+//	void send8Frames(EndStn& source);
+
+
+	//
+	//  Build some Devices
+	//
+	/**/
+	std::vector<unique_ptr<Device>> Devices;   // Pointer to each device stored in a vector
+
+	int brgCnt = 3;
+	int brgMacCnt = 8;
+	int endStnCnt = 3;
+	int endStnMacCnt = 4;
+
+	cout << "   Building Devices:  " << endl << endl;
+	if (SimLog::Debug > 0)
+		SimLog::logFile << "   Building Devices:  " << endl << endl;
+
+	for (int dev = 0; dev < brgCnt + endStnCnt; dev++)
+	{
+		unique_ptr<Device> thisDev = nullptr;
+		if (dev < brgCnt)  // Build Bridges first
+		{
+			thisDev = make_unique<Device>(brgMacCnt);     // Make a device with brgMacCnt MACs
+			thisDev->createBridge(CVlanEthertype);        // Add a C-VLAN bridge component with a bridge port for each MAC
+		}
+		else               //    then build End Stations
+		{
+			thisDev = make_unique<Device>(endStnMacCnt);  // Make a device with endStnMacCnt MACs
+			thisDev->createEndStation();                  // Add an end station component
+		}
+		Devices.push_back(move(thisDev));                       // Put Device in vector of Devices
+	}
+
+	//
+	//  Run the simulation
+	//
+	cout << endl << "   Running Simulation:  " << endl << endl;
+	if (SimLog::Debug > 0)
+		SimLog::logFile << "   Running Simulation (with Debug level " << SimLog::Debug << "):  " << endl << endl;
+
+	SimLog::Time = 0;
+
+	//
+	//  Select Link Aggregation tests to run
+	//
+
+    //	basicLagTest(Devices);
+
+
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

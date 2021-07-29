@@ -1,5 +1,5 @@
 /*
-Copyright 2020 Stephen Haddock Consulting, LLC
+Copyright 2021 Stephen Haddock Consulting, LLC
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ limitations under the License.
 #include "stdafx.h"
 #include "Device.h"
 #include "Frame.h"
-#include "LinkAgg.h"
-#include "Aggregator.h"
+// #include "LinkAgg.h"
+// #include "Aggregator.h"
 #include "Mac.h"
 
 
@@ -139,6 +139,7 @@ void Device::createBridge(unsigned short type, bool includeDR)
 	unique_ptr<Bridge> pBridge = make_unique<Bridge>(devNum, sysNum, nPorts);  // Make a Bridge with a BridgePort for each Mac
 	pBridge->vlanType = type;							               // Set as MAC, C-VLAN, or S-VLAN Bridge
 
+	/*
 	unsigned char LacpVersion = 2;
 	// if (devNum == 0) 
 	//	 LacpVersion = 1;  //  Kludge to make first bridge LACPv1
@@ -157,8 +158,10 @@ void Device::createBridge(unsigned short type, bool includeDR)
 		pLag->pAggPorts.push_back(pAggPort);                                 // Put Aggregation Port in the Device's Lag shim
 		pLag->pDistRelays.push_back(nullptr);
 	}
+	*/
+
 	pComponents.push_back(move(pBridge));                             // Put the Bridge in the Device Components vector
-	pComponents.push_back(move(pLag));                                // Put the Link Aggregation shim in the Device Components vector
+	// pComponents.push_back(move(pLag));                                // Put the Link Aggregation shim in the Device Components vector
 
 }
 
@@ -171,6 +174,7 @@ void Device::createEndStation(bool includeDR)
 	int nPorts = pMacs.size();       // Number of Aggregation Ports = number of Macs in Device
 	unique_ptr<EndStn> pStation = make_unique<EndStn>(devNum, sysNum);  // Make an End Station
 
+	/*
 	unsigned char LacpVersion = 2;
 	//	unique_ptr<LinkAgg> pLag = make_unique<LinkAgg>();
 	unique_ptr<LinkAgg> pLag = make_unique<LinkAgg>(0, LacpVersion);
@@ -200,9 +204,10 @@ void Device::createEndStation(bool includeDR)
 			}
 		}
 	} 
+	*/
 
 	pComponents.push_back(move(pStation));                            // Put the End Station in the Device Components vector
-	pComponents.push_back(move(pLag));                                // Put the Link Aggregation shim in the Device Components vector
+	// pComponents.push_back(move(pLag));                                // Put the Link Aggregation shim in the Device Components vector
 	/**/
 }
 
@@ -271,12 +276,13 @@ void EndStn::run(bool singleStep)
 				{
 					SimLog::logFile << "   Test frame sequence number = " << ((TestSdu&)(pFrame->getNextSdu())).scratchPad << endl;
 				}
+				/*
 				if ((pFrame->getNextEtherType() == SlowProtocolsEthertype) && (pFrame->getNextSubType() == LacpduSubType))
 				{
 					SimLog::logFile << "   Lacpdu System = " << hex << ((Lacpdu&)(pFrame->getNextSdu())).actorSystem.id
 						<< "  Port = " << ((Lacpdu&)(pFrame->getNextSdu())).actorPort.id << dec << endl;
 				}
-
+				*/
 			}
 		}
 	}

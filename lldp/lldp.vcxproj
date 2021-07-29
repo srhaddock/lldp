@@ -139,7 +139,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Bridge.cpp" />
+    <ClCompile Include="Device.cpp" />
+    <ClCompile Include="Frame.cpp" />
     <ClCompile Include="lldp.cpp" />
+    <ClCompile Include="Mac.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Bridge.h" />
+    <ClInclude Include="Device.h" />
+    <ClInclude Include="Frame.h" />
+    <ClInclude Include="Mac.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
