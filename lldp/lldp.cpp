@@ -17,6 +17,14 @@ limitations under the License.
 
 #include <iostream>
 
+#include "stdafx.h"
+#include "Device.h"
+#include "Mac.h"
+#include "Frame.h"
+
+using namespace std;
+
+
 int main()
 {
     std::cout << "Hello World!\n";
