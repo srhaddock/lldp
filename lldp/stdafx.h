@@ -55,11 +55,12 @@ public:
 /**/
 
 enum adminValues { FORCE_FALSE, FORCE_TRUE, AUTO };
-enum ComponentTypes { DEVICE, MAC, BRIDGE, END_STATION, LINK_AGG, DIST_RELAY };
+enum ComponentTypes { DEVICE, MAC, BRIDGE, END_STATION, LINK_AGG, DIST_RELAY, LINK_LAYER_DISCOVERY };
 enum LagAlgorithms { NONE = 0, UNSPECIFIED = 0x0080c200, C_VID, S_VID, I_SID, TE_SID, ECMP_FLOW_HASH };
 
 const unsigned short CVlanEthertype = 0x8100;
 const unsigned short SVlanEthertype = 0x88a8;
+const unsigned short LldpEthertype = 0x88cc;
 const unsigned short SlowProtocolsEthertype = 0x8809;
 const unsigned char LacpduSubType = 0x01;
 const unsigned short DrniEthertype = 0x8952;

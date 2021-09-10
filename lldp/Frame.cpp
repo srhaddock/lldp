@@ -23,7 +23,11 @@ Sdu::Sdu(unsigned short sduEtherType, unsigned short sduSubType)
 {
 	TimeStamp = SimLog::Time;
 	pNextSdu = nullptr;
+
 //	cout << "            Sdu Constructor called (" << SimLog::Time << ")" << endl;
+// Cannot write to logfile when have "const shared_ptr<Sdu> pNullSdu = make_shared<Sdu>(0, 0);"
+//      before logfile is initialized.
+//	SimLog::logFile << "            Sdu Constructor called (" << SimLog::Time << ")" << endl;
 }
 
 Sdu::Sdu(const Sdu& copySource)  // Copy constructor
@@ -32,7 +36,9 @@ Sdu::Sdu(const Sdu& copySource)  // Copy constructor
 	subType = copySource.subType;
 	TimeStamp = copySource.TimeStamp;  // Sdu TimeStamp is copied so retains time at which contents of SDU were current
 	pNextSdu = copySource.pNextSdu;
-//	cout << "***** Sdu Copy Constructor executed ***** (" << SimLog::Time << ")" << endl;
+
+	cout << "***** Sdu Copy Constructor executed ***** (" << SimLog::Time << ")" << endl;
+//	SimLog::logFile << "***** Sdu Copy Constructor executed ***** (" << SimLog::Time << ")" << endl;
 }
 
 Sdu::~Sdu()
@@ -40,10 +46,16 @@ Sdu::~Sdu()
 	pNextSdu = nullptr;
 
 //	cout << "            Sdu Destructor called (" << SimLog::Time << ")" << endl;
+//	SimLog::logFile << "            Sdu Destructor called (" << SimLog::Time << ")" << endl;
 }
 
+/**/
+//TODO:  Should eliminate NullSdu?  Seems like an ugly solution
+//  For the getNextSdu() routines, maybe make them return T/F and modify the input variable to new SDU?
+//  Or change linked list of SDUs to a std:list in the frame? But makes it difficult to separate SDU from frame
 const shared_ptr<Sdu> pNullSdu = make_shared<Sdu>(0, 0);
 const Sdu& NullSdu = *pNullSdu;
+/**/
 
 unsigned short Sdu::getEtherType() const
 {
@@ -93,7 +105,9 @@ Frame::Frame(unsigned long long frameDA, unsigned long long frameSA, shared_ptr<
 	VlanIdentifier = 0;
 	Priority = 0;
 	DropEligible = false;
-//		cout << "Frame constructor called (" << SimLog::Time << ")" << endl;
+
+//	cout << "Frame constructor called (" << SimLog::Time << ")" << endl;
+//	SimLog::logFile << "Frame Constructor called (" << SimLog::Time << ")" << endl;
 }
 
 Frame::Frame(const Frame& CopySource)
@@ -105,7 +119,9 @@ Frame::Frame(const Frame& CopySource)
 	Priority = CopySource.Priority;
 	DropEligible = CopySource.DropEligible;
 	pNextSdu = CopySource.pNextSdu;           // shallow copy is fine
-//	cout << "Frame copy constructor called (" << SimLog::Time << ")" << endl;
+
+	cout << "Frame copy constructor called (" << SimLog::Time << ")" << endl;
+	SimLog::logFile << "Frame copy constructor called (" << SimLog::Time << ")" << endl;
 }
 
 /*
@@ -121,6 +137,7 @@ Frame::~Frame()
 	pNextSdu = nullptr;
 
 //	cout << "Frame destructor called (" << SimLog::Time << ")" << endl;
+//	SimLog::logFile << "Frame destructor called (" << SimLog::Time << ")" << endl;
 }
 
 /**/
@@ -216,19 +233,19 @@ VlanTag::VlanTag(unsigned short type, unsigned short identifier, unsigned short 
 	Vtag.id = identifier;
 	Vtag.pri = priority;
 	Vtag.de = dropEligible;
-//	cout << "        VlanTag Constructor called" << endl;
+	cout << "        VlanTag Constructor called" << endl;
 }
 
 VlanTag::VlanTag(const VlanTag& copySource)  // Copy constructor
 	: Sdu(copySource)
 {
 	Vtag = copySource.Vtag;
-//	cout << "***** VlanTag Copy Constructor executed *****" << endl;
+	cout << "***** VlanTag Copy Constructor executed *****" << endl;
 }
 
 VlanTag::~VlanTag()
 {
-//	cout << "        VlanTag Destructor called" << endl;
+	cout << "        VlanTag Destructor called" << endl;
 }
 
 const VlanTag& VlanTag::getVlanTag(Frame& taggedFrame)        // Returns a constant reference to the Vlan tag
@@ -243,13 +260,13 @@ const VlanTag& VlanTag::getVlanTag(Frame& taggedFrame)        // Returns a const
 TestSdu::TestSdu(int scratchData) 
 	: Sdu(PlaypenEthertypeA, 1), scratchPad(scratchData)
 {
-//	cout << "    TestSdu Constructor called" << endl;
+	cout << "    TestSdu Constructor called" << endl;
 
 }
 
 TestSdu::~TestSdu()
 {
-//	cout << "    TestSdu Destructor called" << endl;
+	cout << "    TestSdu Destructor called" << endl;
 
 }
 

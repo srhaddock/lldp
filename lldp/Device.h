@@ -21,6 +21,7 @@ limitations under the License.
 // #include "LinkAgg.h"
 // #include "DistributedRelay.h"
 
+using namespace std;
 
 /*
 *   Class EndStn (End Station) is a system component that can be contained in a Device.
@@ -77,7 +78,12 @@ public:
 
 	std::vector<unique_ptr<Component>> pComponents;
 	std::vector<shared_ptr<Mac>> pMacs;
-	shared_ptr<iLink> pDistRelayLink;
+
+	// pDistRelayLink is a relic of a DRNI implementation that instantiate the Distributed Relay as a separate component within a device
+	//   and used an iLink to connect it to a BridgePort.
+	// shared_ptr<iLink> pDistRelayLink;
+	// A more general solution in the future if need to create iLinks is to provide
+	// std::vector<shared_prt<iLink>> piLinks;
 
 	virtual void reset() override;                         // Initialize all operational parameters of all Components and Macs
 	       //   reset() does not restore default configuration, just initial state of operational variables
@@ -88,8 +94,8 @@ public:
 	void transmit();                      // If not suspended, Transmit a Frame from any Macs in Device with a Frame ready to transmit
 	void disconnect();                    // Disconnect all Macs in the Device that are connected to other Macs
 
-	void createBridge(unsigned short type = 0, bool includeDR = false);     // Helper function for creating a Device with a single Bridge Component
-	void createEndStation(bool includeDR = false);                          // Helper function for creating a Device with a single End Station Component
+	void createBridge(unsigned short type = 0, string sysName = "", string sysDesc = "");     // Helper function for creating a Device with a single Bridge Component
+	void createEndStation(string sysName = "", string sysDesc = "");                          // Helper function for creating a Device with a single End Station Component
 
 protected:
 	static unsigned short devCnt;

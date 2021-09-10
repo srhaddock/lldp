@@ -21,6 +21,7 @@ limitations under the License.
 #include "Device.h"
 #include "Mac.h"
 #include "Frame.h"
+#include "LinkLayerDiscovery.h"
 
 using namespace std;
 
@@ -29,9 +30,11 @@ int main()
 {
     std::cout << "Hello World!\n";
 	SimLog::logFile << endl;
-	SimLog::Debug = 8; // 6 9
+	SimLog::Debug = 15; // 6 9
+	SimLog::Time = 0;
 
 //	void send8Frames(EndStn& source);
+	void basicLldpTest(std::vector<unique_ptr<Device>> & Devices);
 
 
 	//
@@ -49,14 +52,24 @@ int main()
 	if (SimLog::Debug > 0)
 		SimLog::logFile << "   Building Devices:  " << endl << endl;
 
-	for (int dev = 0; dev < brgCnt + endStnCnt; dev++)
-	{
+//	for (int dev = 0; dev < brgCnt + endStnCnt; dev++)
+	for (int dev = 0; dev < brgCnt; dev++)              // Just build bridges
+		{
 		unique_ptr<Device> thisDev = nullptr;
 		if (dev < brgCnt)  // Build Bridges first
 		{
 			thisDev = make_unique<Device>(brgMacCnt);     // Make a device with brgMacCnt MACs
-			thisDev->createBridge(CVlanEthertype);        // Add a C-VLAN bridge component with a bridge port for each MAC
+		//	thisDev->createBridge(CVlanEthertype);        // Add a C-VLAN bridge component with a bridge port for each MAC
+		//TODO:  This kludge gives each bridge a unique name
+			switch (dev)
+			{
+			case 0: thisDev->createBridge(CVlanEthertype, "Larry", "is in New York"); break;
+			case 1: thisDev->createBridge(CVlanEthertype, "Curly", "is in Boston"); break; 
+			case 2: thisDev->createBridge(CVlanEthertype, "  Moe", "is in Denver"); break;
+			default: thisDev->createBridge(CVlanEthertype, "Anonymous", "is not to be found"); break;
+			}
 		}
+//TODO:  End stations are broken
 		else               //    then build End Stations
 		{
 			thisDev = make_unique<Device>(endStnMacCnt);  // Make a device with endStnMacCnt MACs
@@ -68,19 +81,101 @@ int main()
 	//
 	//  Run the simulation
 	//
-	cout << endl << "   Running Simulation:  " << endl << endl;
+	cout << endl << endl << "   Running Simulation:  " << endl << endl;
 	if (SimLog::Debug > 0)
 		SimLog::logFile << "   Running Simulation (with Debug level " << SimLog::Debug << "):  " << endl << endl;
 
 	SimLog::Time = 0;
 
 	//
-	//  Select Link Aggregation tests to run
+	//  Select Link Layer Discovery tests to run
 	//
 
-    //	basicLagTest(Devices);
+    basicLldpTest(Devices);
+
+	//
+	// Clean up devices.
+	//
+
+	cout << endl << "    Cleaning up devices:" << endl << endl;
+	if (SimLog::Debug > 0)
+		SimLog::logFile << "    Cleaning up devices:" << endl << endl;
+
+	Devices.clear();
+
+	cout << endl << "*** End of program ***" << endl;
+	if (SimLog::Debug > 0)
+		SimLog::logFile << "*** End of program ***" << endl << endl;
+
+	return 0;
+}
 
 
+void basicLldpTest(std::vector<unique_ptr<Device>>& Devices)
+{
+	int start = SimLog::Time;
+
+	cout << endl << endl << "   Basic LLDP Tests:  " << endl << endl;
+	if (SimLog::Debug > 0)
+		SimLog::logFile << endl << endl << "   Basic LLDP Tests:  " << endl << endl;
+
+	for (auto& pDev : Devices)
+	{
+		pDev->reset();   // Reset all devices
+	}
+
+	LinkLayerDiscovery& dev0Lldp = (LinkLayerDiscovery&)*(Devices[0]->pComponents[1]);  // alias to LLDP shim of bridge b00
+//  LinkAgg& dev0Lag = (LinkAgg&)*(Devices[0]->pComponents[1]);  // alias to LinkAgg shim of bridge b00
+//	dev0Lldp.pLldpPorts[0]->set_aAggPortWTRTime(30);                  // temp: set WTR timer on bridge:port b00:100
+
+	for (int i = 0; i < 1000; i++)
+	{
+		if (SimLog::Debug > 1)
+			SimLog::logFile << "*" << endl;
+
+		//  Make or break connections
+
+		if (SimLog::Time == start + 10)
+			Mac::Connect((Devices[0]->pMacs[0]), (Devices[1]->pMacs[0]), 5);   // Connect two Bridges
+		// Link 1 comes up with AggPort b00:100 on Aggregator b00:200 and AggPort b01:100 on Aggregator b01:200.
+
+		if (SimLog::Time == start + 300)
+			Mac::Disconnect((Devices[0]->pMacs[0]));                           // Take down first link
+		// Link 1 goes down and conversations immediately re-allocated to other links.
+		// AggPorts b00:102 and b00:103 remain up on Aggregator b00:200
+
+		if (SimLog::Time == start + 990)
+		{
+//			dev0Lag.pAggPorts[0]->set_aAggPortWTRTime(0);                  // temp: restore default WTR timer on bridge:port b00:100
+			for (auto& pDev : Devices)
+			{
+				pDev->disconnect();      // Disconnect all remaining links on all devices
+			}
+		}
+
+
+		//  Run all state machines in all devices
+		for (auto& pDev : Devices)
+		{
+			pDev->timerTick();     // Decrement timers
+			pDev->run(true);   // Run device with single-step true
+		}
+
+		//  Transmit from any MAC with frames to transmit
+		if ((SimLog::Debug > 0)  && (SimLog::Time < 0))
+			SimLog::logFile << endl <<  "   About to transmit from MACs  " << endl;
+
+		for (auto& pDev : Devices)
+		{
+			pDev->transmit();
+		}
+
+		if ((SimLog::Debug > 0) && (SimLog::Time < 0))
+			SimLog::logFile  << "   Done transmiting from MACs  " << endl;
+
+
+		SimLog::Time++;
+	}
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

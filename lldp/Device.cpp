@@ -19,7 +19,9 @@ limitations under the License.
 #include "Frame.h"
 // #include "LinkAgg.h"
 // #include "Aggregator.h"
+#include "LinkLayerDiscovery.h"
 #include "Mac.h"
+#include <string>
 
 
 
@@ -29,16 +31,11 @@ Device::Device(int numMacs)
 	: Component(ComponentTypes::DEVICE)
 {
 	devNum = devCnt++;
-//	std::vector<shared_ptr<Mac>> Macs(numMacs, make_shared<Mac>());
 	for (unsigned short i = 0; i < numMacs; i++)
 	{
-		macIdentifier thisMacId;
-		thisMacId.dev = devNum;
-		thisMacId.sap = i;
-//		pMacs.push_back(make_shared<Mac>(thisMacId));
 		pMacs.push_back(make_shared<Mac>(devNum, i));
 	}
-	pDistRelayLink = make_shared<iLink>();
+//	pDistRelayLink = make_shared<iLink>();
 
 
 //	cout << "Device Constructor called. devNum = " << devNum << " and Count = " << devCnt << endl;
@@ -131,7 +128,7 @@ void Device::disconnect()                         // Disconnect all Macs in the 
 
 
 
-void Device::createBridge(unsigned short type, bool includeDR)
+void Device::createBridge(unsigned short type, string sysName, string sysDesc)
 {
 	/**/
 	unsigned short sysNum = 0;       // This is a single system device
@@ -139,7 +136,17 @@ void Device::createBridge(unsigned short type, bool includeDR)
 	unique_ptr<Bridge> pBridge = make_unique<Bridge>(devNum, sysNum, nPorts);  // Make a Bridge with a BridgePort for each Mac
 	pBridge->vlanType = type;							               // Set as MAC, C-VLAN, or S-VLAN Bridge
 
-	/*
+	// **** Connect MACs to BridgePorts
+	for (unsigned short i = 0; i < nPorts; i++)                            // For each Mac:
+	{
+		pBridge->bPorts[i]->pIss = pMacs[i];                               // Make the Bridge Port pIss point to the MAC
+		pMacs[i]->updateMacSystemId(pBridge->SystemId.id);                 // Update Mac address/sapId with device type and sysNum
+	}
+
+	// **** Insert protocol shims at the top of the interface stack (i.e. build from the bottom up)
+
+	/*    
+	//  **** Insert Link Aggregation shim
 	unsigned char LacpVersion = 2;
 	// if (devNum == 0) 
 	//	 LacpVersion = 1;  //  Kludge to make first bridge LACPv1
@@ -148,26 +155,63 @@ void Device::createBridge(unsigned short type, bool includeDR)
 
 	for (unsigned short i = 0; i < nPorts; i++)    // For each Mac:
 	{
-//		shared_ptr<Aggregator> pAggregator = make_shared<Aggregator>();    // Create an Aggregator
 		shared_ptr<AggPort> pAggPort = make_shared<AggPort>(pLag->LacpVersion, sysNum, i);    // Create an Aggregation Port/Aggregator pair
-		pAggPort->assignActorSystem(pBridge->SystemId);                       // Assign Aggregation Port/Aggregator to this bridge
-		pBridge->bPorts[i]->pIss = pAggPort;                               // Attach the Aggregation Port/Aggregator to a BridgePort
-		pAggPort->pIss = pMacs[i];                                         // Attach the Mac to the Aggregation Port
-		pMacs[i]->updateMacSystemId(pBridge->SystemId.id);                 // Update Mac address/sapId with device type and sysNum
-		pLag->pAggregators.push_back(pAggPort);                              // Put Aggregator in the Device's Lag shim
-		pLag->pAggPorts.push_back(pAggPort);                                 // Put Aggregation Port in the Device's Lag shim
-		pLag->pDistRelays.push_back(nullptr);
+		pAggPort->assignActorSystem(pBridge->SystemId);                    // Assign Aggregation Port/Aggregator to this bridge
+		pAggPort->pIss = pBridge->bPorts[i]->pIss;                         // Copy BridgePort pIss to AgggregationPort/Aggregator pIss
+		pBridge->bPorts[i]->pIss = pAggPort;                               // Attach the Aggregation Port/Aggregator to a BridgePort pIss
+		pLag->pAggregators.push_back(pAggPort);                            // Put Aggregator in the Device's Lag shim
+		pLag->pAggPorts.push_back(pAggPort);                               // Put Aggregation Port in the Device's Lag shim
+		pLag->pDistRelays.push_back(nullptr);                              // No Distribution Relays yet, so initialize with null pointers
 	}
-	*/
+	/**/
+
+	/**/  
+	//  **** Insert Link Layer Discovery shim
+	//       Architecturally these should be at LLC layer, but in simulation easier to treat as a shim
+	//TODO:  Create official ChassisId and PortId.  For now use Bridge's system ID and MAC's mac ID
+
+	unique_ptr<LinkLayerDiscovery> pLLDP = make_unique<LinkLayerDiscovery>(pBridge->SystemId.id);
+
+	for (unsigned short i = 0; i < nPorts; i++)    // For each Mac:
+	{
+		unsigned long portId = pMacs[i]->getMacId();
+		unsigned long long lldpDA = NearestBridgeDA;
+		shared_ptr<LldpPort> pLldpPort = make_shared<LldpPort>(pLLDP->chassisId, portId, lldpDA);    // Create an LLDP instance
+		pLldpPort->pIss = pBridge->bPorts[i]->pIss;                        // Copy BridgePort pIss to LLDP instance pIss
+		pBridge->bPorts[i]->pIss = pLldpPort;                              // Attach the LLDP instance to a BridgePort pIss
+		pLldpPort->setEnabled(true);                                       // Enable the ISS (ISS to higher layer)  ::TODO: rename this IssEnabled?
+		
+		// Initialize some stuff for the local MIB entry.  This is the wrong place for this, but will do for now.
+		pLldpPort->set_systemName(sysName);
+		pLldpPort->set_systemDescription(sysDesc);
+		string portAnimal = "This port is a ";
+		switch (i)
+		{
+		case 0: portAnimal += "dog (0)"; break;
+		case 1: portAnimal += "cat (1)"; break;
+		case 2: portAnimal += "horse (2)"; break;
+		case 3: portAnimal += "cow (3)"; break;
+		case 4: portAnimal += "pig (4)"; break;
+		case 5: portAnimal += "chicken (5)"; break;
+		case 6: portAnimal += "goat (6)"; break;
+		case 7: portAnimal += "sheep (7)"; break;
+		default: portAnimal += "elephant"; break;
+		}
+		pLldpPort->set_portDescription(portAnimal);
+
+		pLLDP->pLldpPorts.push_back(pLldpPort);                            // Put LLDP instance in the Device's LLDP shim
+	}
+	/**/
 
 	pComponents.push_back(move(pBridge));                             // Put the Bridge in the Device Components vector
 	// pComponents.push_back(move(pLag));                                // Put the Link Aggregation shim in the Device Components vector
+	pComponents.push_back(move(pLLDP));                               // Put the Link Layer Discovery shim in the Device Components vector
 
 }
 
 
 
-void Device::createEndStation(bool includeDR)
+void Device::createEndStation(string sysName, string sysDesc)
 {
 	/**/
 	unsigned short sysNum = 0;       // This is a single system device
@@ -262,7 +306,7 @@ void EndStn::run(bool singleStep)
 	if (!suspended) 
 	{ 
 		//TODO:  Currently run always single steps.  When singleStep is false should iterate until rx queue empty
-		unique_ptr<Frame> pFrame = std::move(pIss->Indication());
+ 		unique_ptr<Frame> pFrame = std::move(pIss->Indication());
 		if (pFrame)
 		{
 			rxFrameCount++;
@@ -288,6 +332,7 @@ void EndStn::run(bool singleStep)
 	}
 }
 
+/**/
 void EndStn::generateTestFrame(shared_ptr<Sdu> pTag)
 {
 	if (pIss->getOperational())  // Transmit frame only if MAC won't immediately discard
@@ -303,3 +348,4 @@ void EndStn::generateTestFrame(shared_ptr<Sdu> pTag)
 	}
 	sequenceNumber++;    // Increment sequence number (even if MAC would have immediately discarded frame)
 }
+/**/
