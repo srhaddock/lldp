@@ -139,6 +139,25 @@ void basicLldpTest(std::vector<unique_ptr<Device>>& Devices)
 			Mac::Connect((Devices[0]->pMacs[0]), (Devices[1]->pMacs[0]), 5);   // Connect two Bridges
 		// Link 1 comes up with AggPort b00:100 on Aggregator b00:200 and AggPort b01:100 on Aggregator b01:200.
 
+		if (SimLog::Time == start + 33)      // remove neighbor MIB info on dev 0 port 0
+		{
+			LinkLayerDiscovery& LLDP = (LinkLayerDiscovery&)*(Devices[0]->pComponents[1]);  // assumes LLDP shim is component after bridge
+			LLDP.pLldpPorts[0]->test_removeNbor();
+		}
+
+		if (SimLog::Time == start + 50)      // set lldpV2Enabled in all ports on all three bridges
+		{
+			for (unsigned int i = 0; i < 3; i++)
+			{
+				LinkLayerDiscovery& LLDP = (LinkLayerDiscovery&)*(Devices[i]->pComponents[1]);  // assumes LLDP shim is component after bridge
+				for (unsigned int j = 0; j < LLDP.pLldpPorts.size(); j++)
+				{
+					LldpPort& port = *LLDP.pLldpPorts[j];
+					port.set_lldpV2Enabled(true);
+				}
+			}
+		}
+
 		if (SimLog::Time == start + 300)
 			Mac::Disconnect((Devices[0]->pMacs[0]));                           // Take down first link
 		// Link 1 goes down and conversations immediately re-allocated to other links.

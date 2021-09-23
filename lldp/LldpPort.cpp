@@ -21,11 +21,21 @@ limitations under the License.
 
 MibEntry::MibEntry()
 {
+	rxTtl = 0;
 	ttlTimer = 0;
 	totalSize = 0;
 }
 
 MibEntry::~MibEntry()
+{}
+
+xpduMapEntry::xpduMapEntry()
+{
+	sizeXpduTlvs = 0;
+	status = RxXpduStatus::CURRENT;
+}
+
+xpduMapEntry::~xpduMapEntry()
 {}
 
 manXpdu::manXpdu(unsigned char num, unsigned char rev, unsigned long check)
@@ -40,12 +50,13 @@ manXpdu::~manXpdu()
 {}
 
 LldpPort::LldpPort(unsigned long long chassis, unsigned long port, unsigned long long dstAddr)
-	: chassisId(chassis), portId(port), lldpDestinationAddress(dstAddr)
+	: chassisId(chassis), portId(port), lldpScopeAddress(dstAddr)
 {
 
 	pIss = nullptr;
 
 	pRxLldpFrame = nullptr;
+	maxSizeNborMIBs = 20000;    // arbitrary maximum size for storing all neighbor MIB info
 
 	//   Initialize local MIB entry
 	bool success = false;
@@ -60,10 +71,10 @@ LldpPort::LldpPort(unsigned long long chassis, unsigned long port, unsigned long
 	if (!success)
 		SimLog::logFile << "Time " << SimLog::Time << ":   LldpTxSM failed to create PortID TLV" << endl;
 
-	localMIB.ttl = TlvTtl(msgTxInterval * msgTxHold);   // Create TTL TLV
+//	localMIB.ttl = TlvTtl(msgTxInterval * msgTxHold);   // Create TTL TLV
 	localMIB.ttlTimer = 0;                              // TTL timer not used on local MIB Entry
 
-	localMIB.totalSize = 6 + localMIB.chassisID.getLength() + localMIB.portID.getLength() + localMIB.ttl.getLength();
+	localMIB.totalSize = 8 + localMIB.chassisID.getLength() + localMIB.portID.getLength();
 
 
 	systemName = "Someone";               // System Name not yet assigned
@@ -73,36 +84,83 @@ LldpPort::LldpPort(unsigned long long chassis, unsigned long port, unsigned long
 	/**/
 	// Initialize local MIB entry manifest
 	//   Need the Normal/Manifest LLDPDU and at least 3 XPDUs (with at least one TLV each) for testing
-	unique_ptr<manXpdu> pXpdu0 = make_unique<manXpdu>();   // xpdu0 is for Normal/Manifest TLV
+	/*
+//	unique_ptr<manXpdu> pXpdu0 = make_unique<manXpdu>();   // xpdu0 is for Normal/Manifest TLV
+	shared_ptr<manXpdu> pXpdu0 = make_shared<manXpdu>();   // xpdu0 is for Normal/Manifest TLV
 	pXpdu0->xpduTlvs.push_back(TlvString(TLVtypes::SYSTEM_NAME, systemName));
-	localMIB.pManXpdus.push_back(move(pXpdu0));
+	localMIB.pManXpdus.push_back(pXpdu0);
 	localMIB.totalSize += (2 + systemName.length());
 
-	unique_ptr<manXpdu> pXpdu1 = make_unique<manXpdu>(1, 1, 0x0101);
+//	unique_ptr<manXpdu> pXpdu1 = make_unique<manXpdu>(1, 1, 0x0101);
+	shared_ptr<manXpdu> pXpdu1 = make_shared<manXpdu>(1, 1, 0x0101);
 	pXpdu1->xpduTlvs.push_back(TlvString(TLVtypes::SYSTEM_DESC, systemDescription));
-	localMIB.pManXpdus.push_back(move(pXpdu1));
+	localMIB.pManXpdus.push_back(pXpdu1);
 	localMIB.totalSize += (2 + systemDescription.length());
 
-	unique_ptr<manXpdu> pXpdu2 = make_unique<manXpdu>(2, 1, 0x0201);
+	//	unique_ptr<manXpdu> pXpdu2 = make_unique<manXpdu>(2, 1, 0x0201);
+	shared_ptr<manXpdu> pXpdu2 = make_shared<manXpdu>(2, 1, 0x0201);
 	pXpdu2->xpduTlvs.push_back(TlvString(TLVtypes::PORT_DESC, portDescription));
-	localMIB.pManXpdus.push_back(move(pXpdu2));
+	localMIB.pManXpdus.push_back(pXpdu2);
 	localMIB.totalSize += (2 + portDescription.length());
 
-	unique_ptr<manXpdu> pXpdu3 = make_unique<manXpdu>(3, 1, 0x0301);
+	//	unique_ptr<manXpdu> pXpdu3 = make_unique<manXpdu>(3, 1, 0x0301);
+	shared_ptr<manXpdu> pXpdu3 = make_shared<manXpdu>(3, 1, 0x0301);
 	//TODO: Using OUI = 00:00:01 for test purposes; subtype 0xaa
 	string xpdu3str = "Somehow";
 	TLV xpdu3Tlv = TlvOui(0x000001aa, 4 + (unsigned short)xpdu3str.length());   
 	xpdu3Tlv.putString(6, xpdu3str);
 	pXpdu3->xpduTlvs.push_back(xpdu3Tlv);
-	localMIB.pManXpdus.push_back(move(pXpdu3));
+	localMIB.pManXpdus.push_back(pXpdu3);
 	localMIB.totalSize += (6 + xpdu3str.length());
+	/**/
+	SimLog::logFile << "     creating local MIB xpdu map: " << hex;
+	xpduMapEntry xpdu0;
+	xpduDescriptor desc0(0, 1, 0);
+	xpdu0.xpduDesc = desc0;
+	xpdu0.pTlvs.push_back(make_shared<TlvString>(TLVtypes::SYSTEM_NAME, systemName));
+	xpdu0.sizeXpduTlvs = xpdu0.pTlvs[0]->getLength();
+	localMIB.xpduMap.insert(make_pair(xpdu0.xpduDesc.num, xpdu0));
+	SimLog::logFile << "(num = " << (unsigned short)xpdu0.xpduDesc.num << " , mapSize = " << localMIB.xpduMap.size()
+		<< " TLV type " << (unsigned short)localMIB.xpduMap.at(xpdu0.xpduDesc.num).pTlvs[0]->getType() << " ) ";
+
+	xpduMapEntry xpdu1;
+	xpduDescriptor desc1(1, 1, 0x0101);
+	xpdu1.xpduDesc = desc1;
+	xpdu1.pTlvs.push_back(make_shared<TlvString>(TLVtypes::SYSTEM_DESC, systemDescription));
+	xpdu1.sizeXpduTlvs = xpdu1.pTlvs[0]->getLength();
+	localMIB.xpduMap.insert(make_pair(xpdu1.xpduDesc.num, xpdu1));
+	SimLog::logFile << "(num = " << (unsigned short)xpdu1.xpduDesc.num << " , mapSize = " << localMIB.xpduMap.size()
+		<< " TLV type " << (unsigned short)localMIB.xpduMap.at(xpdu1.xpduDesc.num).pTlvs[0]->getType() << " ) ";
+
+	xpduMapEntry xpdu2;
+	xpduDescriptor desc2(2, 1, 0x0201);
+	xpdu2.xpduDesc = desc2;
+	xpdu2.pTlvs.push_back(make_shared<TlvString>(TLVtypes::PORT_DESC, portDescription));
+	xpdu2.sizeXpduTlvs = xpdu1.pTlvs[0]->getLength();
+	localMIB.xpduMap.insert(make_pair(xpdu2.xpduDesc.num, xpdu2));
+	SimLog::logFile << "(num = " << (unsigned short)xpdu2.xpduDesc.num << " , mapSize = " << localMIB.xpduMap.size()
+		<< " TLV type " << (unsigned short)localMIB.xpduMap.at(xpdu2.xpduDesc.num).pTlvs[0]->getType() << " ) ";
+
+	xpduMapEntry xpdu3;
+	xpduDescriptor desc3(3, 1, 0x0301);
+	xpdu3.xpduDesc = desc3;
+	string xpdu3str = "Somehow";
+	xpdu3.pTlvs.push_back(make_shared<TlvOui>(0x000001aa, 4 + (unsigned short)xpdu3str.length()));
+	xpdu3.pTlvs[0]->putString(6, xpdu3str);
+	xpdu3.sizeXpduTlvs = xpdu1.pTlvs[0]->getLength();
+	localMIB.xpduMap.insert(make_pair(xpdu3.xpduDesc.num, xpdu3));
+	SimLog::logFile << "(num = " << (unsigned short)xpdu3.xpduDesc.num << " , mapSize = " << localMIB.xpduMap.size()
+		<< " TLV type " << (unsigned short)localMIB.xpduMap.at(xpdu3.xpduDesc.num).pTlvs[0]->getType() << " ) ";
+	SimLog::logFile << dec << endl;
+	SimLog::logFile << "      local MIB xpduMap has " << localMIB.xpduMap.size() << " entries" << endl;
+
 	/**/
 
 
 
 
 	operational = false;                                       // Set by Receive State Machine based on ISS.Operational
-	lldpV2Enabled = true;                                          //TODO:  what changes lldpV2Enabled?
+	lldpV2Enabled = false;                                      //TODO:  what changes lldpV2Enabled?
 	/**/
 
 //	cout << "LldpPort Constructor called." << endl;
@@ -179,6 +237,7 @@ void LldpPort::updateManifest(TLVtypes tlvChanged)
 	//TODO:  Problem with just updating totalSize is that if it is ever incorrect it will stay that way
 	switch (tlvChanged)
 	{
+	/*
 	case SYSTEM_NAME:
 		// update(replace) first TLV in Normal/Manifest LLDPDU
 		localMIB.pManXpdus[0]->xpduDesc.rev ++;
@@ -199,6 +258,28 @@ void LldpPort::updateManifest(TLVtypes tlvChanged)
 		localMIB.pManXpdus[2]->xpduDesc.check++;  // should be calculated
 		localMIB.totalSize += (portDescription.length() - localMIB.pManXpdus[2]->xpduTlvs[0].getLength());
 		localMIB.pManXpdus[2]->xpduTlvs[0] = (TlvString(TLVtypes::PORT_DESC, portDescription));
+		break;
+	/**/
+	case SYSTEM_NAME:
+		// update(replace) first TLV in Normal/Manifest LLDPDU
+		localMIB.xpduMap.at(0).xpduDesc.rev++;
+		localMIB.xpduMap.at(0).xpduDesc.check++;  // should be calculated
+		localMIB.totalSize += (systemName.length() - localMIB.xpduMap.at(0).pTlvs[0]->getLength());
+		localMIB.xpduMap.at(0).pTlvs[0] = make_shared<TLV>(TlvString(TLVtypes::SYSTEM_NAME, systemName));
+		break;
+	case SYSTEM_DESC:
+		// update(replace) first TLV in first XPDU
+		localMIB.xpduMap.at(1).xpduDesc.rev++;
+		localMIB.xpduMap.at(1).xpduDesc.check++;  // should be calculated
+		localMIB.totalSize += (systemDescription.length() - localMIB.xpduMap.at(1).pTlvs[0]->getLength());
+		localMIB.xpduMap.at(1).pTlvs[0] = make_shared<TLV>(TlvString(TLVtypes::SYSTEM_DESC, systemDescription));
+		break;
+	case PORT_DESC:
+		// update(replace) first TLV in second XPDU
+		localMIB.xpduMap.at(2).xpduDesc.rev++;
+		localMIB.xpduMap.at(2).xpduDesc.check++;  // should be calculated
+		localMIB.totalSize += (portDescription.length() - localMIB.xpduMap.at(2).pTlvs[0]->getLength());
+		localMIB.xpduMap.at(2).pTlvs[0] = make_shared<TLV>(TlvString(TLVtypes::PORT_DESC, portDescription));
 		break;
 	}
 	localChange = true;
@@ -237,8 +318,22 @@ void LldpPort::set_portDescription(string input)
 	updateManifest(TLVtypes::PORT_DESC);
 }
 
+bool LldpPort::get_lldpV2Enabled()
+{
+	return (lldpV2Enabled);
+}
+
+void LldpPort::set_lldpV2Enabled(bool enable)  // if no constraint checking then might as well make public variable
+{
+	lldpV2Enabled = enable;
+}
 
 /**/
 
+void LldpPort::test_removeNbor()
+{
+	if (nborMIBs.size() > 0)       // if there is a neighbor MIB entry
+		nborMIBs.pop_back();       //     remove the neighbor at the end of the list
+}
 
 

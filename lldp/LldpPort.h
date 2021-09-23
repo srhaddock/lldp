@@ -36,6 +36,18 @@ public:
 	std::vector<TLV> xpduTlvs;
 };
 
+class xpduMapEntry
+{
+public:
+	xpduMapEntry();
+	~xpduMapEntry();
+
+	xpduDescriptor xpduDesc;
+	unsigned long sizeXpduTlvs;
+	RxXpduStatus status;
+	vector<shared_ptr<TLV>> pTlvs;
+};
+
 class MibEntry
 {
 public:
@@ -44,10 +56,15 @@ public:
 
 	TLV chassisID;
 	TLV portID;
-	TLV ttl; 
+//	TLV ttl; 
+	unsigned short rxTtl;
 	unsigned short ttlTimer;
-	int totalSize;
-	std::vector<unique_ptr<manXpdu>> pManXpdus;
+	unsigned long totalSize;
+//	std::vector<unique_ptr<manXpdu>> pManXpdus;
+//	std::vector<shared_ptr<manXpdu>> pManXpdus;
+//	std::vector<shared_ptr<manXpdu>> pRxXpdus;
+
+	map<unsigned char, xpduMapEntry> xpduMap;
 };
 
 class LldpPort : public IssQ
@@ -74,7 +91,7 @@ public:
  private:
 	unsigned long long chassisId;
 	unsigned long portId;
-	unsigned long long lldpDestinationAddress;
+	unsigned long long lldpScopeAddress;
 	bool operational;                   // maybe don't have local variable, just pass through from supporting service
 	bool lldpV2Enabled;
 
@@ -96,7 +113,7 @@ public:
 
 	MibEntry localMIB;
 	std::vector<MibEntry> nborMIBs;
-	
+	unsigned long long maxSizeNborMIBs;
 
 public:
 	/*
@@ -110,6 +127,11 @@ public:
 	void set_systemDescription(string input);
 	string get_portDescription();
 	void set_portDescription(string input);
+
+	bool get_lldpV2Enabled();
+	void set_lldpV2Enabled(bool enable);
+
+	void test_removeNbor();
 
 	/**/
 private:
@@ -141,17 +163,20 @@ private:
 		static RxSmStates enterRxXpduRequest(LldpPort& port, const Lldpdu& rxLldpdu);
 
 		static void rxCheckTimers(LldpPort& port);
-		static RxTypes rxProcessFrame(LldpPort& port, const Lldpdu& rxLldpdu);
-		static void rxNormal(LldpPort& port);
+		static RxTypes rxProcessFrame(LldpPort& port);
+		static void rxNormal(LldpPort& port, Lldpdu& rxLldpdu);
 		static void rxDeleteInfo(LldpPort& port);
 		static void rxUpdateInfo(LldpPort& port);
 
-		static void createNeighbor(LldpPort& port);
+		static void createNeighbor(LldpPort& port, std::vector<TLV>& tlvs);
 	//	static bool runRxExtended(LldpPort& port);
 		static bool xRxManifest(LldpPort& port);
 		static bool xRxXPDU(LldpPort& port);
 		static bool xRxCheckManifest(LldpPort& port);
 		static void generateXREQ(LldpPort& port);
+	//	static bool findNeighbor(LldpPort& port, std::vector<TLV>& tlvs, int index);
+		static unsigned int findNborIndex(LldpPort& port, std::vector<TLV>& tlvs);
+		static bool roomForNewNeighbor(LldpPort& port, unsigned long newNborSize);
 	/**/
 	};
 

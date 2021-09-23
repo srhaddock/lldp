@@ -17,6 +17,16 @@ limitations under the License.
 #include "stdafx.h"
 #include "Lldpdu.h"
 
+xpduDescriptor::xpduDescriptor(unsigned char numIn, unsigned char revIn, unsigned long checkIn)
+{
+	num = numIn;
+	rev = revIn;
+	check = checkIn;
+}
+
+xpduDescriptor::~xpduDescriptor()
+{}
+
 TLV::TLV(unsigned char type, unsigned short length)
 {
 	if ((type > 0) && (type < 128) && (length < 512))   // If valid type and length
@@ -34,9 +44,10 @@ TLV::TLV(unsigned char type, unsigned short length)
 //	cout << "Constructor for TLV with type " << (unsigned short)type << "  and length " << length
 //		<< hex << " : v[0] = 0x" << (unsigned short)v[0] 
 //		<< "  v[1] = 0x" << (unsigned short)v[1] << dec << endl;
-//	SimLog::logFile << "Constructor for TLV with type " << (unsigned short)type << "  and length " << length
-//		<< hex << " : v[0] = 0x" << (unsigned short)v[0]
-//		<< "  v[1] = 0x" << (unsigned short)v[1] << dec << endl;
+	if (SimLog::Time > 2)
+		SimLog::logFile << "Constructor for TLV with type " << (unsigned short)type << "  and length " << length
+		<< hex << " : v[0] = 0x" << (unsigned short)v[0]
+		<< "  v[1] = 0x" << (unsigned short)v[1] << dec << endl;
 }
 
 TLV::TLV(const TLV& copySource)  // Copy constructor
@@ -44,14 +55,20 @@ TLV::TLV(const TLV& copySource)  // Copy constructor
 	v = copySource.v;
 	
 //	cout << "***** TLV Copy Constructor executed ***** (" << SimLog::Time << ")" << endl;
-//	SimLog::logFile << "***** TLV Copy Constructor executed for type " << (unsigned short)getType() 
-//		<<  " ***** (" << SimLog::Time << ")" << endl;
+	if (SimLog::Time > 2)
+		SimLog::logFile << "***** TLV Copy Constructor executed for type " << (unsigned short)getType()
+		<<  " ***** (" << SimLog::Time << ")" << endl;
 }
 
 TLV::~TLV()
 {
 //	cout << "Destructor for TLV of type " << getType() << endl;
-//	SimLog::logFile << "Destructor for TLV of type " << getType() << endl;
+	if (SimLog::Time > 2)
+		SimLog::logFile << "Destructor for TLV of type " << getType() << "  and length " << getLength() << endl;
+}
+bool TLV::operator== (TLV& tlv)
+{
+	return (v == tlv.v);
 }
 
 unsigned short TLV::getType() 
@@ -302,9 +319,15 @@ TlvString::~TlvString()
 
 
 
-tlvManifest::tlvManifest(unsigned short length)
-	: TLV(TLVtypes::MANIFEST, length)
-{}
+tlvManifest::tlvManifest(unsigned long long returnAddr, unsigned char numXpdus, unsigned long size)
+	: TLV(TLVtypes::MANIFEST, 10 + (6 * numXpdus))
+{
+	putAddr(2, returnAddr);
+	puttotalSize(size);
+	putChar(11, numXpdus);
+	SimLog::logFile << "Creating manifest TLV with " << (unsigned short)numXpdus << " XPDUs and total size = "
+		<< size << " and TLV length = " << v.size() - 2 << endl;
+}
 
 tlvManifest::~tlvManifest()
 {}
@@ -363,7 +386,7 @@ bool tlvManifest::putNumXpdus(unsigned char numXpdus)
 
 bool tlvManifest::putXpduDescriptor(unsigned short position, xpduDescriptor desc)
 {
-	unsigned short index = 12 + (position * 4);
+	unsigned short index = 12 + (position * 6);
 	bool success = putChar(index, desc.num);
 	success &= putChar(index + 1, desc.rev);
 	success &= putLong(index + 2, desc.check);

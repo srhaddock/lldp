@@ -45,6 +45,7 @@ public:
 	TLV(unsigned char type = 0, unsigned short length = 0);
 	TLV(const TLV& copySource);      // copy constructor
 	~TLV();
+	bool operator== (TLV& tlv);
 
 	unsigned short getType();
 	unsigned short getLength();
@@ -96,6 +97,9 @@ public:
 class xpduDescriptor
 {
 public:
+	xpduDescriptor(unsigned char numIn = 0, unsigned char revIn = 0, unsigned long checkIn = 0);
+	~xpduDescriptor();
+
 	unsigned char num;
 	unsigned char rev;
 	unsigned long check;
@@ -104,7 +108,7 @@ public:
 class tlvManifest : public TLV
 {
 public:
-	tlvManifest(unsigned short length);
+	tlvManifest(unsigned long long returnAddr = 0, unsigned char numXpdus = 0, unsigned long size = 0);
 	~tlvManifest();
 
 	unsigned long long getReturnAddr();

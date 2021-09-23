@@ -94,6 +94,7 @@ void LinkLayerDiscovery::run(bool singleStep)
 		// Receive data path
 		for (unsigned short i = 0; i < nPorts; i++)              // For each LLDP Port:
 		{
+			LldpPort& port = *pLldpPorts[i];
 
 			if ((SimLog::Debug > 12) && (SimLog::Time < 0))
 			{
@@ -103,8 +104,9 @@ void LinkLayerDiscovery::run(bool singleStep)
 					<< dec << endl;
 			}
 			/**/
-			pTempFrame = move(pLldpPorts[i]->pIss->Indication());   // Get ingress frame, if available, from ISS
-			if (pTempFrame)                                        // If there is an ingress frame
+			if (port.pIss)  // verify there is a supporting service before using it
+				pTempFrame = move(pLldpPorts[i]->pIss->Indication());   // Get ingress frame, if available, from ISS
+			if (pTempFrame)                                            // If there is an ingress frame
 			{
 				if (SimLog::Debug > 5)
 				{
@@ -115,14 +117,21 @@ void LinkLayerDiscovery::run(bool singleStep)
 					SimLog::logFile << dec << endl;
 					/**/
 				}
-				if ((pTempFrame->MacDA == pLldpPorts[i]->lldpDestinationAddress) &&   // if frame has proper DA and contains an LLDPDU
-					(pTempFrame->getNextEtherType() == LldpEthertype))
+				if ((pTempFrame->MacDA == port.lldpScopeAddress)  &&   // If frame has the proper Scope DA 
+					(pTempFrame->getNextEtherType() == LldpEthertype))       //    and etherType indicates LLDPDU
 				{
-					pLldpPorts[i]->pRxLldpFrame = move(pTempFrame);                   // then pass to LLDP RxSM
+					pLldpPorts[i]->pRxLldpFrame = move(pTempFrame);          //    then pass to LLDP RxSM
 				}
-				else                                                                  
+				else                                             
 				{
-					pLldpPorts[i]->indications.push(move(pTempFrame));                // else pass it up the stack
+					if ((pTempFrame->MacDA == port.pIss->getMacAddress()) &&                 // If frame has this port's MAC Address
+						(pTempFrame->getNextEtherType() == LldpEthertype))                   //    and etherType indicates LLDPDU
+					{
+						pLldpPorts[i]->pRxLldpFrame = make_unique<Frame>(*pTempFrame);       //    then pass a copy to LLDP RxSM
+						//  Need to pass a copy up stack since LLDP layer is modeled as a shim handling a single Scope address
+						//    and a LLDPDU with a unicast address could be destined for a different LLDP shim with different Scope
+					}
+					pLldpPorts[i]->indications.push(move(pTempFrame));                // Pass the frame up the stack
 				}
 			}
 		}

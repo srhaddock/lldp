@@ -64,7 +64,10 @@ void Bridge::run(bool singleStep)
 			{
 				thisFrame = std::move(ingress->pIss->Indication());
 			}
-			if (thisFrame)                                      //      If there is an ingress frame
+			if ((thisFrame) &&                                           // If there is an ingress frame
+				(thisFrame->MacDA != ingress->pIss->getMacAddress()))    //    not destined to this ingress port
+				//TODO: Need to do other address filtering here.  Consider case where port has multiple address (LAG)
+				//  and at least filter 802.1 reserved addresses
 			{
 				for (auto& egress : bPorts)
 				{

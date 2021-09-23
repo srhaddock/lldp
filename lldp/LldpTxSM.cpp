@@ -141,7 +141,7 @@ bool LldpPort::LldpTxSM::transmitLldpdu(LldpPort& port, int TTL)
 		unsigned long long mySA = port.pIss->getMacAddress();
 		shared_ptr<Lldpdu> pMyLldpdu = std::make_shared<Lldpdu>();
 		prepareLldpdu(port, *pMyLldpdu, TTL);
-		unique_ptr<Frame> myFrame = make_unique<Frame>(port.lldpDestinationAddress, mySA, (shared_ptr<Sdu>)pMyLldpdu);
+		unique_ptr<Frame> myFrame = make_unique<Frame>(port.lldpScopeAddress, mySA, (shared_ptr<Sdu>)pMyLldpdu);
 		port.pIss->Request(move(myFrame));
 		success = true;
 
@@ -150,7 +150,7 @@ bool LldpPort::LldpTxSM::transmitLldpdu(LldpPort& port, int TTL)
 			// SimLog::logFile << "Time " << SimLog::Time << ":  Transmit LACPDU" 
 			SimLog::logFile << "Time " << SimLog::Time << ":  Transmit LLDPDU from" 
 				<< hex << " chassis " << port.chassisId << "  port " << port.portId
-				<< "  with DA " << port.lldpDestinationAddress << " and SA " << port.pIss->getMacAddress() 
+				<< "  with DA " << port.lldpScopeAddress << " and SA " << port.pIss->getMacAddress() 
 				<< dec << endl;
 		}
 
@@ -210,82 +210,79 @@ void LldpPort::LldpTxSM::prepareLldpdu(LldpPort& port, Lldpdu& myLldpdu, unsigne
 		myLldpdu.tlvs.push_back(TlvTtl(TTL));             // Create TTL TLV on tlvs vector
 		/**/
 
-	//	myLldpdu.tlvs.push_back(TlvString(TLVtypes::SYSTEM_NAME, port.systemName));
-		/**/
+		//	myLldpdu.tlvs.push_back(TlvString(TLVtypes::SYSTEM_NAME, port.systemName));
+		/*
 		if (!port.localMIB.pManXpdus.empty() && port.localMIB.pManXpdus[0])
-				for (auto tlv : port.localMIB.pManXpdus[0]->xpduTlvs)
-				{
-					SimLog::logFile << "local MIB entry has an xpdu in first entry of pManXpdus ";
-					TLV& tlv3 = (port.localMIB.pManXpdus[0]->xpduTlvs[0]);
-					SimLog::logFile << "with type = " << (unsigned short)tlv3.getType() << endl;
-					myLldpdu.tlvs.push_back(tlv3);
-				}
+			for (auto& tlv : port.localMIB.pManXpdus[0]->xpduTlvs)
+			{
+				myLldpdu.tlvs.push_back(tlv);
+			}
 		else
 			SimLog::logFile << "local MIB entry has invalid first pManXpdu" << endl;
 		/**/
-		
-		SimLog::logFile << "4th TLV: ";
-		myLldpdu.tlvs[3].printBytes();
-		SimLog::logFile << "  : ";
-		myLldpdu.tlvs[3].printString(2);
-		SimLog::logFile << endl;
-
-
-
-
-	}
-
-	/*
-	myLacpdu.actorSystem = port.actorOperSystem;
-	myLacpdu.actorKey = port.actorOperPortKey;
-	myLacpdu.actorPort = port.actorPort;
-	myLacpdu.actorState = port.actorOperPortState;
-
-	myLacpdu.partnerSystem.id = port.partnerOperSystem.id;
-	myLacpdu.partnerKey = port.partnerOperKey;
-	myLacpdu.partnerSystem = port.partnerOperSystem;
-	myLacpdu.partnerPort.id = port.partnerOperPort.id;
-	myLacpdu.partnerState.state = port.partnerOperPortState.state;
-
-	myLacpdu.collectorMaxDelay = port.collectorMaxDelay;  
-
-	/*
-	if (port.actorLacpVersion >= 2)        // if v2 send portAlgorithm etc from current or previous aggregator
-	{
-		myLacpdu.portAlgorithmTlv = true;
-		myLacpdu.portConversationIdDigestTlv = true;
-		//TODO:  should I create a per-AggPort boolean that controls whether Service Mapping TLV included?
-		myLacpdu.portConvServiceDigestTlv = true;
-		myLacpdu.linkNumber = port.LinkNumber;
-
-		myLacpdu.actorPortAlgorithm = port.actorOperPortAlgorithm;
-		myLacpdu.actorConvLinkDigest = port.actorOperConvLinkDigest;
-		if (myLacpdu.portConvServiceDigestTlv)
-			myLacpdu.actorConvServiceDigest = port.actorOperConvServiceDigest;
-
-		myLacpdu.portConversationMaskTlvs = false;
-		/*
-		//  Ax-2014 only
-		myLacpdu.portConversationMaskTlvs = port.longLacpduXmit && port.enableLongLacpduXmit && (port.partnerLacpVersion >= 2);
-		// Test enableLongLacpduXmit and partnerLacpVersion even though already tested to set longLacpduXmit in case they change
-		//   while longLacpduXmit is true.
-		if (myLacpdu.portConversationMaskTlvs)
+		auto xpdu0 = port.localMIB.xpduMap.find(0);     // Get xpduMap entry pair for XPDU 0 (Normal LLDPDU)
+		if (xpdu0 != port.localMIB.xpduMap.end())
 		{
-			myLacpdu.actorPortConversationMaskState.actorPartnerSync = port.actorPartnerSync;
-			myLacpdu.actorPortConversationMaskState.DWC = port.actorDWC;
-			myLacpdu.actorPortConversationMaskState.PSI = false;      //TODO: Not relevant ?
-			myLacpdu.actorPortConversationMask = port.portOperConversationMask;
+			for (auto pTlv : xpdu0->second.pTlvs)       // Copy all TLVs to LLDPDU
+			{
+				myLldpdu.tlvs.push_back(*pTlv);
+			}
 		}
+		else
+			SimLog::logFile << "local MIB entry has invalid first pManXpdu" << endl;
+		/**/
+
+
 		/*
+	//	if (port.lldpV2Enabled && (port.localMIB.pManXpdus.size() > 1))       // If LLDPV2 and have xpdus in manifest
+		if ((port.localMIB.pManXpdus.size() > 1))       // If  have xpdus in manifest   // send even if not v2 for testing
+		{
+			// Create manifest TLV and put in LLDPDU
+			unsigned char numXpdus = (unsigned char)port.localMIB.pManXpdus.size() - 1;
+			unsigned long totalSize = 0;  //TODO:  calculate real total size
+			// Note that have already checked pIss not nullptr before calling prepareLldpdu
+			tlvManifest manifest(port.pIss->getMacAddress(), numXpdus);
+			for (unsigned short i = 1; i < port.localMIB.pManXpdus.size(); i++)
+			{
+				manifest.putXpduDescriptor(i - 1, port.localMIB.pManXpdus[i]->xpduDesc);
+				SimLog::logFile << "    Pushing manifest XPDU number " << i << endl;
+			}
+			myLldpdu.tlvs.push_back(manifest);
+
+		}
+		/**/
+
+		map<unsigned char, xpduMapEntry>& myMap = port.localMIB.xpduMap;
+	//	if (port.lldpV2Enabled && (myMap.size() > 1))       // If LLDPV2 and have xpdus in manifest
+		if ((myMap.size() > 1))       // If  have xpdus in manifest   // send even if not v2 for testing
+		{
+			SimLog::logFile << "    Creating manifest for " << myMap.size() << " XPDUs." << endl;
+			// Create manifest TLV and put in LLDPDU
+			unsigned char numXpdus = (unsigned char)myMap.size() - 1;
+			unsigned long totalSize = myMap.at(0).sizeXpduTlvs;  // Init total size with size of Normal LLDPDU
+			tlvManifest manifest(port.pIss->getMacAddress(), numXpdus);
+			unsigned short position = 0;
+			for (auto& xpduMapPair : myMap)
+			{
+				SimLog::logFile << "        myMap XPDU " << (unsigned short)xpduMapPair.first;
+				if (xpduMapPair.first != 0)                          //  For all map entries except the Normal LLDPDU entry
+				{
+					totalSize += xpduMapPair.second.sizeXpduTlvs;                        // update the total MIB size
+					manifest.putXpduDescriptor(position, xpduMapPair.second.xpduDesc);   // put XPDU descriptor in manifest TLV
+					xpduDescriptor myDesc = xpduMapPair.second.xpduDesc;
+					SimLog::logFile << "    Pushing manifest XPDU " << (unsigned short)myDesc.num << " / " << (unsigned short)myDesc.rev 
+						<< " / " << hex << myDesc.check << " at position " << position << dec << endl;
+					position++;                                                          // increment position in manifest TLV
+				}
+				else 
+					SimLog::logFile << "    Gets no entry in the manifest at position " << position << endl;
+			}
+			myLldpdu.tlvs.push_back(manifest);
+		}
+
+
+		/**/
 	}
-	else
-	{
-		myLacpdu.portAlgorithmTlv = false;
-		myLacpdu.portConversationIdDigestTlv = false;
-		myLacpdu.portConvServiceDigestTlv = false;
-		myLacpdu.portConversationMaskTlvs = false;
-	}
-	/**/
 }
 /**/
 
