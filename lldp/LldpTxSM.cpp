@@ -220,8 +220,8 @@ void LldpPort::LldpTxSM::prepareLldpdu(LldpPort& port, Lldpdu& myLldpdu, unsigne
 		else
 			SimLog::logFile << "local MIB entry has invalid first pManXpdu" << endl;
 		/**/
-		auto xpdu0 = port.localMIB.xpduMap.find(0);     // Get xpduMap entry pair for XPDU 0 (Normal LLDPDU)
-		if (xpdu0 != port.localMIB.xpduMap.end())
+		auto xpdu0 = port.localMIB.pXpduMap->find(0);     // Get xpdu Map entry pair for XPDU 0 (Normal LLDPDU)
+		if (xpdu0 != port.localMIB.pXpduMap->end())
 		{
 			for (auto pTlv : xpdu0->second.pTlvs)       // Copy all TLVs to LLDPDU
 			{
@@ -252,8 +252,8 @@ void LldpPort::LldpTxSM::prepareLldpdu(LldpPort& port, Lldpdu& myLldpdu, unsigne
 		}
 		/**/
 
-		map<unsigned char, xpduMapEntry>& myMap = port.localMIB.xpduMap;
-	//	if (port.lldpV2Enabled && (myMap.size() > 1))       // If LLDPV2 and have xpdus in manifest
+		map<unsigned char, xpduMapEntry>& myMap = *(port.localMIB.pXpduMap);
+		//	if (port.lldpV2Enabled && (myMap.size() > 1))       // If LLDPV2 and have xpdus in manifest
 		if ((myMap.size() > 1))       // If  have xpdus in manifest   // send even if not v2 for testing
 		{
 			SimLog::logFile << "    Creating manifest for " << myMap.size() << " XPDUs." << endl;

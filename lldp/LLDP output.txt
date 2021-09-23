@@ -3,78 +3,78 @@
 
 LinkLayerDiscovery Constructor called.  chassis 0x24a60b000000
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b000000  port 0x0
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b000000  port 0x1
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b000000  port 0x2
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b000000  port 0x3
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b000000  port 0x4
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b000000  port 0x5
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b000000  port 0x6
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b000000  port 0x7
 LinkLayerDiscovery Constructor called.  chassis 0x24a60b010000
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b010000  port 0x10000
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b010000  port 0x10001
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b010000  port 0x10002
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b010000  port 0x10003
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b010000  port 0x10004
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b010000  port 0x10005
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b010000  port 0x10006
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b010000  port 0x10007
 LinkLayerDiscovery Constructor called.  chassis 0x24a60b020000
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b020000  port 0x20000
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b020000  port 0x20001
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b020000  port 0x20002
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b020000  port 0x20003
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b020000  port 0x20004
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b020000  port 0x20005
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b020000  port 0x20006
      creating local MIB xpdu map: (num = 0 , mapSize = 1 TLV type 5 ) (num = 1 , mapSize = 2 TLV type 6 ) (num = 2 , mapSize = 3 TLV type 4 ) (num = 3 , mapSize = 4 TLV type 7f ) 
-      local MIB xpduMap has 4 entries
+      local MIB xpdu Map has 4 entries
 LldpPort Constructor called.  chassis 0x24a60b020000  port 0x20007
    Running Simulation (with Debug level 15):  
 
@@ -444,12 +444,14 @@ Destructor for TLV of type 9  and length 28
 Time 31:  Transmit LLDPDU from chassis 24a60b010000  port 10000  with DA 180c200000e and SA 24a600010000
 *
 *
+33:  first call sets pXpduMap to nullptr
 Destructor for TLV of type 5  and length 7
 Destructor for TLV of type 9  and length 28
+*
+*
+35:  second call removes entire nbor
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 1  and length 7
-*
-*
 *
 *
 Time 37:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600010000:88cc:0

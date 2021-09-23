@@ -139,7 +139,7 @@ void basicLldpTest(std::vector<unique_ptr<Device>>& Devices)
 			Mac::Connect((Devices[0]->pMacs[0]), (Devices[1]->pMacs[0]), 5);   // Connect two Bridges
 		// Link 1 comes up with AggPort b00:100 on Aggregator b00:200 and AggPort b01:100 on Aggregator b01:200.
 
-		if (SimLog::Time == start + 33)      // remove neighbor MIB info on dev 0 port 0
+		if ((SimLog::Time == start + 33) || (SimLog::Time == start + 35))     // remove neighbor MIB info on dev 0 port 0
 		{
 			LinkLayerDiscovery& LLDP = (LinkLayerDiscovery&)*(Devices[0]->pComponents[1]);  // assumes LLDP shim is component after bridge
 			LLDP.pLldpPorts[0]->test_removeNbor();

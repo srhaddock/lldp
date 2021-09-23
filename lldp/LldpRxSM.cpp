@@ -330,21 +330,23 @@ void LldpPort::LldpRxSM::rxNormal(LldpPort& port, Lldpdu& rxLldpdu)
 			nborChanged = true;       // Note this will signal something changed even if only TTL changed.
 		}
 		/**/
-		if (port.nborMIBs[index].xpduMap.size() != 1)           // if more than one LLDPDU previously recieved
+		map<unsigned char, xpduMapEntry>& nborMap = *(port.nborMIBs[index].pXpduMap);
+
+		if (nborMap.size() != 1)           // if more than one LLDPDU previously recieved
 		{
-			xpduMapEntry normalLldpduMapEntry = port.nborMIBs[index].xpduMap.at(0);   // save old map entry for Normal LLDPDU
-			port.nborMIBs[index].xpduMap.clear();                                     // clear out old xpdu entries
-			port.nborMIBs[index].xpduMap.insert(make_pair(0, normalLldpduMapEntry));  // restore old map entry for Normal LLDPDU
+			xpduMapEntry normalLldpduMapEntry = nborMap.at(0);   // save old map entry for Normal LLDPDU
+			nborMap.clear();                                     // clear out old xpdu entries
+			nborMap.insert(make_pair(0, normalLldpduMapEntry));  // restore old map entry for Normal LLDPDU
 		}
-		bool tlvsMatch = port.nborMIBs[index].xpduMap.at(0).pTlvs.size() == (rxTlvs.size() - 3);
+		bool tlvsMatch = nborMap.at(0).pTlvs.size() == (rxTlvs.size() - 3);
 		if (tlvsMatch && (rxTlvs.size() > 3))                                                // see if new TLVs match old
 			for (unsigned int i = 0; i < (rxTlvs.size() - 3); i++)
-				tlvsMatch &= *(port.nborMIBs[index].xpduMap.at(0).pTlvs[i]) == rxTlvs[i + 3];
+				tlvsMatch &= *(nborMap.at(0).pTlvs[i]) == rxTlvs[i + 3];
 		if (!tlvsMatch && (rxTlvs.size() > 3))                                               // if new TLVs don't match old
 		{
-			port.nborMIBs[index].xpduMap.at(0).pTlvs.clear();                                //    then clear old TLVs      
+			nborMap.at(0).pTlvs.clear();                                                     //    then clear old TLVs      
 			for (unsigned int i = 0; i < (rxTlvs.size() - 3); i++)                           //    and for each new TLV
-				port.nborMIBs[index].xpduMap.at(0).pTlvs[i] = make_shared<TLV>(rxTlvs[i + 3]); //  copy TLV and put pointer in map
+				nborMap.at(0).pTlvs[i] = make_shared<TLV>(rxTlvs[i + 3]);                    //  copy TLV and put pointer in map
 			nborChanged = true;       // Note this will signal something changed even if only TTL changed.
 		}
 	}
@@ -352,15 +354,8 @@ void LldpPort::LldpRxSM::rxNormal(LldpPort& port, Lldpdu& rxLldpdu)
 	SimLog::logFile << "    After rxNormal size of nbors is " << port.nborMIBs.size();
 	if (port.nborMIBs.size() > 0)
 	{
-		/*
-		SimLog::logFile << " and entry " << index;
-		if ((port.nborMIBs[0].pManXpdus.size() > 0) && port.nborMIBs[0].pManXpdus[0])
-		{
-			SimLog::logFile << " has " << port.nborMIBs[0].pManXpdus[0]->xpduTlvs.size() << " TLVs ";
-		}
-		/**/
-		SimLog::logFile << " and entry " << (unsigned short)port.nborMIBs[0].xpduMap.begin()->first;
-		SimLog::logFile << " has " << port.nborMIBs[0].xpduMap.begin()->second.pTlvs.size() << " TLVs ";
+		SimLog::logFile << " and entry " << (unsigned short)port.nborMIBs[0].pXpduMap->begin()->first;
+		SimLog::logFile << " has " << port.nborMIBs[0].pXpduMap->begin()->second.pTlvs.size() << " TLVs ";
 	}
 	SimLog::logFile << " with change = " << nborChanged << endl;
 
@@ -482,10 +477,7 @@ unsigned int LldpPort::LldpRxSM::findNborIndex(LldpPort& port, std::vector<TLV>&
 			 newNborMapEntry.sizeXpduTlvs += (2 + tlvs[i].getLength());   // update cumulative size of tlvs
 			 newNborMapEntry.pTlvs.push_back(make_shared<TLV>(tlvs[i]));  // copy TLVs and put pointers in map
 		 }
-	 newNbor.xpduMap.insert(make_pair(0, newNborMapEntry));  // Put xpdu map entry in map with key=0
-
-//	 newNbor.ttl = tlvs[2];
-//	 newNbor.pManXpdus.push_back(make_shared<manXpdu>(0, 0, 0));  // Add a pointer to "xpdu 0" with no tlvs
+	 newNbor.pXpduMap->insert(make_pair(0, newNborMapEntry));  // Put xpdu map entry in map with key=0
 
 	 port.nborMIBs.push_back(newNbor);   // Add MIB entry to list of neighbors
  }

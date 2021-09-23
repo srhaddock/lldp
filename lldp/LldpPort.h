@@ -25,17 +25,6 @@ class Lacpdu;
 
 enum RxXpduStatus { CURRENT, NEW, UPDATE, REQUESTED, RETRIED };
 
-class manXpdu
-{
-public:
-	manXpdu(unsigned char num = 0, unsigned char rev = 0, unsigned long check = 0);
-	~manXpdu();
-
-	xpduDescriptor xpduDesc;
-	RxXpduStatus status;
-	std::vector<TLV> xpduTlvs;
-};
-
 class xpduMapEntry
 {
 public:
@@ -60,11 +49,8 @@ public:
 	unsigned short rxTtl;
 	unsigned short ttlTimer;
 	unsigned long totalSize;
-//	std::vector<unique_ptr<manXpdu>> pManXpdus;
-//	std::vector<shared_ptr<manXpdu>> pManXpdus;
-//	std::vector<shared_ptr<manXpdu>> pRxXpdus;
 
-	map<unsigned char, xpduMapEntry> xpduMap;
+	shared_ptr< map<unsigned char, xpduMapEntry>> pXpduMap;
 };
 
 class LldpPort : public IssQ

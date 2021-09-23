@@ -24,6 +24,7 @@ MibEntry::MibEntry()
 	rxTtl = 0;
 	ttlTimer = 0;
 	totalSize = 0;
+	pXpduMap = make_shared<map<unsigned char, xpduMapEntry>>();
 }
 
 MibEntry::~MibEntry()
@@ -38,16 +39,6 @@ xpduMapEntry::xpduMapEntry()
 xpduMapEntry::~xpduMapEntry()
 {}
 
-manXpdu::manXpdu(unsigned char num, unsigned char rev, unsigned long check)
-{
-	xpduDesc.num = num;
-	xpduDesc.rev = rev;
-	xpduDesc.check = check;
-	status = RxXpduStatus::CURRENT;
-}
-
-manXpdu::~manXpdu()
-{}
 
 LldpPort::LldpPort(unsigned long long chassis, unsigned long port, unsigned long long dstAddr)
 	: chassisId(chassis), portId(port), lldpScopeAddress(dstAddr)
@@ -84,62 +75,34 @@ LldpPort::LldpPort(unsigned long long chassis, unsigned long port, unsigned long
 	/**/
 	// Initialize local MIB entry manifest
 	//   Need the Normal/Manifest LLDPDU and at least 3 XPDUs (with at least one TLV each) for testing
-	/*
-//	unique_ptr<manXpdu> pXpdu0 = make_unique<manXpdu>();   // xpdu0 is for Normal/Manifest TLV
-	shared_ptr<manXpdu> pXpdu0 = make_shared<manXpdu>();   // xpdu0 is for Normal/Manifest TLV
-	pXpdu0->xpduTlvs.push_back(TlvString(TLVtypes::SYSTEM_NAME, systemName));
-	localMIB.pManXpdus.push_back(pXpdu0);
-	localMIB.totalSize += (2 + systemName.length());
-
-//	unique_ptr<manXpdu> pXpdu1 = make_unique<manXpdu>(1, 1, 0x0101);
-	shared_ptr<manXpdu> pXpdu1 = make_shared<manXpdu>(1, 1, 0x0101);
-	pXpdu1->xpduTlvs.push_back(TlvString(TLVtypes::SYSTEM_DESC, systemDescription));
-	localMIB.pManXpdus.push_back(pXpdu1);
-	localMIB.totalSize += (2 + systemDescription.length());
-
-	//	unique_ptr<manXpdu> pXpdu2 = make_unique<manXpdu>(2, 1, 0x0201);
-	shared_ptr<manXpdu> pXpdu2 = make_shared<manXpdu>(2, 1, 0x0201);
-	pXpdu2->xpduTlvs.push_back(TlvString(TLVtypes::PORT_DESC, portDescription));
-	localMIB.pManXpdus.push_back(pXpdu2);
-	localMIB.totalSize += (2 + portDescription.length());
-
-	//	unique_ptr<manXpdu> pXpdu3 = make_unique<manXpdu>(3, 1, 0x0301);
-	shared_ptr<manXpdu> pXpdu3 = make_shared<manXpdu>(3, 1, 0x0301);
-	//TODO: Using OUI = 00:00:01 for test purposes; subtype 0xaa
-	string xpdu3str = "Somehow";
-	TLV xpdu3Tlv = TlvOui(0x000001aa, 4 + (unsigned short)xpdu3str.length());   
-	xpdu3Tlv.putString(6, xpdu3str);
-	pXpdu3->xpduTlvs.push_back(xpdu3Tlv);
-	localMIB.pManXpdus.push_back(pXpdu3);
-	localMIB.totalSize += (6 + xpdu3str.length());
-	/**/
 	SimLog::logFile << "     creating local MIB xpdu map: " << hex;
+	map<unsigned char, xpduMapEntry>& myMap = *(localMIB.pXpduMap);
 	xpduMapEntry xpdu0;
 	xpduDescriptor desc0(0, 1, 0);
 	xpdu0.xpduDesc = desc0;
 	xpdu0.pTlvs.push_back(make_shared<TlvString>(TLVtypes::SYSTEM_NAME, systemName));
 	xpdu0.sizeXpduTlvs = xpdu0.pTlvs[0]->getLength();
-	localMIB.xpduMap.insert(make_pair(xpdu0.xpduDesc.num, xpdu0));
-	SimLog::logFile << "(num = " << (unsigned short)xpdu0.xpduDesc.num << " , mapSize = " << localMIB.xpduMap.size()
-		<< " TLV type " << (unsigned short)localMIB.xpduMap.at(xpdu0.xpduDesc.num).pTlvs[0]->getType() << " ) ";
+	myMap.insert(make_pair(xpdu0.xpduDesc.num, xpdu0));
+	SimLog::logFile << "(num = " << (unsigned short)xpdu0.xpduDesc.num << " , mapSize = " << myMap.size()
+		<< " TLV type " << (unsigned short)myMap.at(xpdu0.xpduDesc.num).pTlvs[0]->getType() << " ) ";
 
 	xpduMapEntry xpdu1;
 	xpduDescriptor desc1(1, 1, 0x0101);
 	xpdu1.xpduDesc = desc1;
 	xpdu1.pTlvs.push_back(make_shared<TlvString>(TLVtypes::SYSTEM_DESC, systemDescription));
 	xpdu1.sizeXpduTlvs = xpdu1.pTlvs[0]->getLength();
-	localMIB.xpduMap.insert(make_pair(xpdu1.xpduDesc.num, xpdu1));
-	SimLog::logFile << "(num = " << (unsigned short)xpdu1.xpduDesc.num << " , mapSize = " << localMIB.xpduMap.size()
-		<< " TLV type " << (unsigned short)localMIB.xpduMap.at(xpdu1.xpduDesc.num).pTlvs[0]->getType() << " ) ";
+	myMap.insert(make_pair(xpdu1.xpduDesc.num, xpdu1));
+	SimLog::logFile << "(num = " << (unsigned short)xpdu1.xpduDesc.num << " , mapSize = " << myMap.size()
+		<< " TLV type " << (unsigned short)myMap.at(xpdu1.xpduDesc.num).pTlvs[0]->getType() << " ) ";
 
 	xpduMapEntry xpdu2;
 	xpduDescriptor desc2(2, 1, 0x0201);
 	xpdu2.xpduDesc = desc2;
 	xpdu2.pTlvs.push_back(make_shared<TlvString>(TLVtypes::PORT_DESC, portDescription));
 	xpdu2.sizeXpduTlvs = xpdu1.pTlvs[0]->getLength();
-	localMIB.xpduMap.insert(make_pair(xpdu2.xpduDesc.num, xpdu2));
-	SimLog::logFile << "(num = " << (unsigned short)xpdu2.xpduDesc.num << " , mapSize = " << localMIB.xpduMap.size()
-		<< " TLV type " << (unsigned short)localMIB.xpduMap.at(xpdu2.xpduDesc.num).pTlvs[0]->getType() << " ) ";
+	myMap.insert(make_pair(xpdu2.xpduDesc.num, xpdu2));
+	SimLog::logFile << "(num = " << (unsigned short)xpdu2.xpduDesc.num << " , mapSize = " << myMap.size()
+		<< " TLV type " << (unsigned short)myMap.at(xpdu2.xpduDesc.num).pTlvs[0]->getType() << " ) ";
 
 	xpduMapEntry xpdu3;
 	xpduDescriptor desc3(3, 1, 0x0301);
@@ -148,11 +111,11 @@ LldpPort::LldpPort(unsigned long long chassis, unsigned long port, unsigned long
 	xpdu3.pTlvs.push_back(make_shared<TlvOui>(0x000001aa, 4 + (unsigned short)xpdu3str.length()));
 	xpdu3.pTlvs[0]->putString(6, xpdu3str);
 	xpdu3.sizeXpduTlvs = xpdu1.pTlvs[0]->getLength();
-	localMIB.xpduMap.insert(make_pair(xpdu3.xpduDesc.num, xpdu3));
-	SimLog::logFile << "(num = " << (unsigned short)xpdu3.xpduDesc.num << " , mapSize = " << localMIB.xpduMap.size()
-		<< " TLV type " << (unsigned short)localMIB.xpduMap.at(xpdu3.xpduDesc.num).pTlvs[0]->getType() << " ) ";
+	myMap.insert(make_pair(xpdu3.xpduDesc.num, xpdu3));
+	SimLog::logFile << "(num = " << (unsigned short)xpdu3.xpduDesc.num << " , mapSize = " << myMap.size()
+		<< " TLV type " << (unsigned short)myMap.at(xpdu3.xpduDesc.num).pTlvs[0]->getType() << " ) ";
 	SimLog::logFile << dec << endl;
-	SimLog::logFile << "      local MIB xpduMap has " << localMIB.xpduMap.size() << " entries" << endl;
+	SimLog::logFile << "      local MIB xpdu Map has " << myMap.size() << " entries" << endl;
 
 	/**/
 
@@ -235,51 +198,30 @@ void LldpPort::updateManifest(TLVtypes tlvChanged)
 	//TODO:  This currently assumes all TLVs are in a known position in a known xpdu
 	//TODO:  Should calculate check values
 	//TODO:  Problem with just updating totalSize is that if it is ever incorrect it will stay that way
+
+	map<unsigned char, xpduMapEntry>& myMap = *(localMIB.pXpduMap);
 	switch (tlvChanged)
 	{
-	/*
 	case SYSTEM_NAME:
 		// update(replace) first TLV in Normal/Manifest LLDPDU
-		localMIB.pManXpdus[0]->xpduDesc.rev ++;
-		localMIB.pManXpdus[0]->xpduDesc.check ++;  // should be calculated
-		localMIB.totalSize += (systemName.length() - localMIB.pManXpdus[0]->xpduTlvs[0].getLength());
-		localMIB.pManXpdus[0]->xpduTlvs[0] = (TlvString(TLVtypes::SYSTEM_NAME, systemName));
+		myMap.at(0).xpduDesc.rev++;
+		myMap.at(0).xpduDesc.check++;  // should be calculated
+		localMIB.totalSize += (systemName.length() - myMap.at(0).pTlvs[0]->getLength());
+		myMap.at(0).pTlvs[0] = make_shared<TLV>(TlvString(TLVtypes::SYSTEM_NAME, systemName));
 		break;
 	case SYSTEM_DESC:
 		// update(replace) first TLV in first XPDU
-		localMIB.pManXpdus[1]->xpduDesc.rev++;
-		localMIB.pManXpdus[1]->xpduDesc.check++;  // should be calculated
-		localMIB.totalSize += (systemDescription.length() - localMIB.pManXpdus[1]->xpduTlvs[0].getLength());
-		localMIB.pManXpdus[1]->xpduTlvs[0] = (TlvString(TLVtypes::SYSTEM_DESC, systemDescription));
+		myMap.at(1).xpduDesc.rev++;
+		myMap.at(1).xpduDesc.check++;  // should be calculated
+		localMIB.totalSize += (systemDescription.length() - myMap.at(1).pTlvs[0]->getLength());
+		myMap.at(1).pTlvs[0] = make_shared<TLV>(TlvString(TLVtypes::SYSTEM_DESC, systemDescription));
 		break;
 	case PORT_DESC:
 		// update(replace) first TLV in second XPDU
-		localMIB.pManXpdus[2]->xpduDesc.rev++;
-		localMIB.pManXpdus[2]->xpduDesc.check++;  // should be calculated
-		localMIB.totalSize += (portDescription.length() - localMIB.pManXpdus[2]->xpduTlvs[0].getLength());
-		localMIB.pManXpdus[2]->xpduTlvs[0] = (TlvString(TLVtypes::PORT_DESC, portDescription));
-		break;
-	/**/
-	case SYSTEM_NAME:
-		// update(replace) first TLV in Normal/Manifest LLDPDU
-		localMIB.xpduMap.at(0).xpduDesc.rev++;
-		localMIB.xpduMap.at(0).xpduDesc.check++;  // should be calculated
-		localMIB.totalSize += (systemName.length() - localMIB.xpduMap.at(0).pTlvs[0]->getLength());
-		localMIB.xpduMap.at(0).pTlvs[0] = make_shared<TLV>(TlvString(TLVtypes::SYSTEM_NAME, systemName));
-		break;
-	case SYSTEM_DESC:
-		// update(replace) first TLV in first XPDU
-		localMIB.xpduMap.at(1).xpduDesc.rev++;
-		localMIB.xpduMap.at(1).xpduDesc.check++;  // should be calculated
-		localMIB.totalSize += (systemDescription.length() - localMIB.xpduMap.at(1).pTlvs[0]->getLength());
-		localMIB.xpduMap.at(1).pTlvs[0] = make_shared<TLV>(TlvString(TLVtypes::SYSTEM_DESC, systemDescription));
-		break;
-	case PORT_DESC:
-		// update(replace) first TLV in second XPDU
-		localMIB.xpduMap.at(2).xpduDesc.rev++;
-		localMIB.xpduMap.at(2).xpduDesc.check++;  // should be calculated
-		localMIB.totalSize += (portDescription.length() - localMIB.xpduMap.at(2).pTlvs[0]->getLength());
-		localMIB.xpduMap.at(2).pTlvs[0] = make_shared<TLV>(TlvString(TLVtypes::PORT_DESC, portDescription));
+		myMap.at(2).xpduDesc.rev++;
+		myMap.at(2).xpduDesc.check++;  // should be calculated
+		localMIB.totalSize += (portDescription.length() - myMap.at(2).pTlvs[0]->getLength());
+		myMap.at(2).pTlvs[0] = make_shared<TLV>(TlvString(TLVtypes::PORT_DESC, portDescription));
 		break;
 	}
 	localChange = true;
@@ -330,10 +272,22 @@ void LldpPort::set_lldpV2Enabled(bool enable)  // if no constraint checking then
 
 /**/
 
+//TODO:: remove this
 void LldpPort::test_removeNbor()
 {
-	if (nborMIBs.size() > 0)       // if there is a neighbor MIB entry
+	// Calling this test at times 33 and 35, when TLV destructor prints a message,
+	//   verifies TLVs correctly destroyed -- no memory leak
+	//   Only works when there is a single neighbor
+	if ((SimLog::Time == 33) && (nborMIBs.size() > 0))       // if there is a neighbor MIB entry
+	{
+		SimLog::logFile << SimLog::Time << ":  first call sets pXpduMap to nullptr" << endl;
+		nborMIBs[0].pXpduMap = nullptr;       //     remove xpdu map at the start of the list
+	}
+	if ((SimLog::Time == 35) && (nborMIBs.size() > 0))       // if there is a neighbor MIB entry
+	{
+		SimLog::logFile << SimLog::Time << ":  second call removes entire nbor" << endl;
 		nborMIBs.pop_back();       //     remove the neighbor at the end of the list
+	}
 }
 
 
