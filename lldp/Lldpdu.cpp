@@ -27,6 +27,14 @@ xpduDescriptor::xpduDescriptor(unsigned char numIn, unsigned char revIn, unsigne
 xpduDescriptor::~xpduDescriptor()
 {}
 
+bool xpduDescriptor::operator== (xpduDescriptor& desc)
+{
+	return ((num == desc.num) &&
+		(rev == desc.rev) &&
+		(check == desc.check));
+}
+
+
 TLV::TLV(unsigned char type, unsigned short length)
 {
 	if ((type > 0) && (type < 128) && (length < 512))   // If valid type and length
@@ -352,7 +360,7 @@ unsigned char tlvManifest::getNumXpdus()
 
 xpduDescriptor tlvManifest::getXpduDescriptor(unsigned short position)
 {
-	unsigned short index = 12 + (position * 4);
+	unsigned short index = 12 + (position * 6);
 	xpduDescriptor desc;
 	desc.num = getChar(index);
 	desc.rev = getChar(index + 1);

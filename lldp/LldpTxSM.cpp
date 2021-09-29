@@ -192,34 +192,6 @@ void LldpPort::LldpTxSM::prepareLldpdu(LldpPort& port, Lldpdu& myLldpdu, unsigne
 
 	if (TTL > 0)               // if not shutdown then add TLVs (else done)
 	{
-		/*
-		bool success = false;
-		TLV chassisTLV(TLVtypes::CHASSIS_ID, 7);           // Create chassis ID TLV
-		success = chassisTLV.putChar(2, 4);                // use subtype 4 (MAC Address)
-		success &= chassisTLV.putAddr(3, port.chassisId);  //    and MAC Address from chassisId
-		if (!success)
-			SimLog::logFile << "Time " << SimLog::Time << ":   LldpTxSM failed to create ChassisID TLV" << endl;
-		myLldpdu.tlvs.push_back(chassisTLV);               // Copy to tlvs vector
-
-		myLldpdu.tlvs.push_back(TLV(TLVtypes::PORT_ID, 5));       // Create port ID TLV on tlvs vector
-		success = myLldpdu.tlvs[1].putChar(2, 4);                 // use subtype 5 (ifName)
-		success &= myLldpdu.tlvs[1].putLong(3, port.portId);      //    and portID
-		if (!success)
-			SimLog::logFile << "Time " << SimLog::Time << ":   LldpTxSM failed to create PortID TLV" << endl;
-
-		myLldpdu.tlvs.push_back(TlvTtl(TTL));             // Create TTL TLV on tlvs vector
-		/**/
-
-		//	myLldpdu.tlvs.push_back(TlvString(TLVtypes::SYSTEM_NAME, port.systemName));
-		/*
-		if (!port.localMIB.pManXpdus.empty() && port.localMIB.pManXpdus[0])
-			for (auto& tlv : port.localMIB.pManXpdus[0]->xpduTlvs)
-			{
-				myLldpdu.tlvs.push_back(tlv);
-			}
-		else
-			SimLog::logFile << "local MIB entry has invalid first pManXpdu" << endl;
-		/**/
 		auto xpdu0 = port.localMIB.pXpduMap->find(0);     // Get xpdu Map entry pair for XPDU 0 (Normal LLDPDU)
 		if (xpdu0 != port.localMIB.pXpduMap->end())
 		{
@@ -232,25 +204,6 @@ void LldpPort::LldpTxSM::prepareLldpdu(LldpPort& port, Lldpdu& myLldpdu, unsigne
 			SimLog::logFile << "local MIB entry has invalid first pManXpdu" << endl;
 		/**/
 
-
-		/*
-	//	if (port.lldpV2Enabled && (port.localMIB.pManXpdus.size() > 1))       // If LLDPV2 and have xpdus in manifest
-		if ((port.localMIB.pManXpdus.size() > 1))       // If  have xpdus in manifest   // send even if not v2 for testing
-		{
-			// Create manifest TLV and put in LLDPDU
-			unsigned char numXpdus = (unsigned char)port.localMIB.pManXpdus.size() - 1;
-			unsigned long totalSize = 0;  //TODO:  calculate real total size
-			// Note that have already checked pIss not nullptr before calling prepareLldpdu
-			tlvManifest manifest(port.pIss->getMacAddress(), numXpdus);
-			for (unsigned short i = 1; i < port.localMIB.pManXpdus.size(); i++)
-			{
-				manifest.putXpduDescriptor(i - 1, port.localMIB.pManXpdus[i]->xpduDesc);
-				SimLog::logFile << "    Pushing manifest XPDU number " << i << endl;
-			}
-			myLldpdu.tlvs.push_back(manifest);
-
-		}
-		/**/
 
 		map<unsigned char, xpduMapEntry>& myMap = *(port.localMIB.pXpduMap);
 		//	if (port.lldpV2Enabled && (myMap.size() > 1))       // If LLDPV2 and have xpdus in manifest

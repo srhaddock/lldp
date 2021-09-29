@@ -605,6 +605,16 @@ Destructor for TLV of type 9  and length 28
 *
 *
 *
+50:  second call removes entire nbor
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+Destructor for TLV of type 2  and length 5
+Destructor for TLV of type 1  and length 7
+50:  second call removes entire nbor
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+Destructor for TLV of type 2  and length 5
+Destructor for TLV of type 1  and length 7
 *
 ***** TLV Copy Constructor executed for type 1 ***** (51)
 ***** TLV Copy Constructor executed for type 2 ***** (51)
@@ -696,6 +706,16 @@ Time 57:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a6000
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is false  and index is 0
+Constructor for TLV with type 0  and length 0 : v[0] = 0x0  v[1] = 0x0
+Constructor for TLV with type 0  and length 0 : v[0] = 0x0  v[1] = 0x0
+***** TLV Copy Constructor executed for type 1 ***** (57)
+***** TLV Copy Constructor executed for type 2 ***** (57)
+Destructor for TLV of type 2  and length 5
+Destructor for TLV of type 1  and length 7
+***** TLV Copy Constructor executed for type 5 ***** (57)
+***** TLV Copy Constructor executed for type 9 ***** (57)
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -707,6 +727,16 @@ Time 57:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24a
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is false  and index is 0
+Constructor for TLV with type 0  and length 0 : v[0] = 0x0  v[1] = 0x0
+Constructor for TLV with type 0  and length 0 : v[0] = 0x0  v[1] = 0x0
+***** TLV Copy Constructor executed for type 1 ***** (57)
+***** TLV Copy Constructor executed for type 2 ***** (57)
+Destructor for TLV of type 2  and length 5
+Destructor for TLV of type 1  and length 7
+***** TLV Copy Constructor executed for type 5 ***** (57)
+***** TLV Copy Constructor executed for type 9 ***** (57)
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -806,6 +836,12 @@ Time 67:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a6000
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (67)
+***** TLV Copy Constructor executed for type 9 ***** (67)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -817,6 +853,12 @@ Time 67:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24a
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (67)
+***** TLV Copy Constructor executed for type 9 ***** (67)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -916,6 +958,12 @@ Time 77:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a6000
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (77)
+***** TLV Copy Constructor executed for type 9 ***** (77)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -927,6 +975,12 @@ Time 77:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24a
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (77)
+***** TLV Copy Constructor executed for type 9 ***** (77)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1026,6 +1080,12 @@ Time 87:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a6000
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (87)
+***** TLV Copy Constructor executed for type 9 ***** (87)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1037,6 +1097,12 @@ Time 87:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24a
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (87)
+***** TLV Copy Constructor executed for type 9 ***** (87)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1136,6 +1202,12 @@ Time 97:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a6000
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (97)
+***** TLV Copy Constructor executed for type 9 ***** (97)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1147,6 +1219,12 @@ Time 97:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24a
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (97)
+***** TLV Copy Constructor executed for type 9 ***** (97)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1246,6 +1324,12 @@ Time 107:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (107)
+***** TLV Copy Constructor executed for type 9 ***** (107)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1257,6 +1341,12 @@ Time 107:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (107)
+***** TLV Copy Constructor executed for type 9 ***** (107)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1356,6 +1446,12 @@ Time 117:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (117)
+***** TLV Copy Constructor executed for type 9 ***** (117)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1367,6 +1463,12 @@ Time 117:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (117)
+***** TLV Copy Constructor executed for type 9 ***** (117)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1466,6 +1568,12 @@ Time 127:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (127)
+***** TLV Copy Constructor executed for type 9 ***** (127)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1477,6 +1585,12 @@ Time 127:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (127)
+***** TLV Copy Constructor executed for type 9 ***** (127)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1576,6 +1690,12 @@ Time 137:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (137)
+***** TLV Copy Constructor executed for type 9 ***** (137)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1587,6 +1707,12 @@ Time 137:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (137)
+***** TLV Copy Constructor executed for type 9 ***** (137)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1686,6 +1812,12 @@ Time 147:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (147)
+***** TLV Copy Constructor executed for type 9 ***** (147)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1697,6 +1829,12 @@ Time 147:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (147)
+***** TLV Copy Constructor executed for type 9 ***** (147)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1796,6 +1934,12 @@ Time 157:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (157)
+***** TLV Copy Constructor executed for type 9 ***** (157)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1807,6 +1951,12 @@ Time 157:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (157)
+***** TLV Copy Constructor executed for type 9 ***** (157)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1906,6 +2056,12 @@ Time 167:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (167)
+***** TLV Copy Constructor executed for type 9 ***** (167)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -1917,6 +2073,12 @@ Time 167:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (167)
+***** TLV Copy Constructor executed for type 9 ***** (167)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2016,6 +2178,12 @@ Time 177:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (177)
+***** TLV Copy Constructor executed for type 9 ***** (177)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2027,6 +2195,12 @@ Time 177:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (177)
+***** TLV Copy Constructor executed for type 9 ***** (177)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2126,6 +2300,12 @@ Time 187:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (187)
+***** TLV Copy Constructor executed for type 9 ***** (187)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2137,6 +2317,12 @@ Time 187:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (187)
+***** TLV Copy Constructor executed for type 9 ***** (187)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2236,6 +2422,12 @@ Time 197:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (197)
+***** TLV Copy Constructor executed for type 9 ***** (197)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2247,6 +2439,12 @@ Time 197:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (197)
+***** TLV Copy Constructor executed for type 9 ***** (197)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2346,6 +2544,12 @@ Time 207:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (207)
+***** TLV Copy Constructor executed for type 9 ***** (207)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2357,6 +2561,12 @@ Time 207:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (207)
+***** TLV Copy Constructor executed for type 9 ***** (207)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2456,6 +2666,12 @@ Time 217:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (217)
+***** TLV Copy Constructor executed for type 9 ***** (217)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2467,6 +2683,12 @@ Time 217:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (217)
+***** TLV Copy Constructor executed for type 9 ***** (217)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2566,6 +2788,12 @@ Time 227:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (227)
+***** TLV Copy Constructor executed for type 9 ***** (227)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2577,6 +2805,12 @@ Time 227:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (227)
+***** TLV Copy Constructor executed for type 9 ***** (227)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2676,6 +2910,12 @@ Time 237:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (237)
+***** TLV Copy Constructor executed for type 9 ***** (237)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2687,6 +2927,12 @@ Time 237:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (237)
+***** TLV Copy Constructor executed for type 9 ***** (237)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2786,6 +3032,12 @@ Time 247:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (247)
+***** TLV Copy Constructor executed for type 9 ***** (247)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2797,6 +3049,12 @@ Time 247:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (247)
+***** TLV Copy Constructor executed for type 9 ***** (247)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2896,6 +3154,12 @@ Time 257:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (257)
+***** TLV Copy Constructor executed for type 9 ***** (257)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -2907,6 +3171,12 @@ Time 257:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (257)
+***** TLV Copy Constructor executed for type 9 ***** (257)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -3006,6 +3276,12 @@ Time 267:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (267)
+***** TLV Copy Constructor executed for type 9 ***** (267)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -3017,6 +3293,12 @@ Time 267:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (267)
+***** TLV Copy Constructor executed for type 9 ***** (267)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -3116,6 +3398,12 @@ Time 277:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (277)
+***** TLV Copy Constructor executed for type 9 ***** (277)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -3127,6 +3415,12 @@ Time 277:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (277)
+***** TLV Copy Constructor executed for type 9 ***** (277)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -3226,6 +3520,12 @@ Time 287:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (287)
+***** TLV Copy Constructor executed for type 9 ***** (287)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -3237,6 +3537,12 @@ Time 287:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (287)
+***** TLV Copy Constructor executed for type 9 ***** (287)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -3336,6 +3642,12 @@ Time 297:  LLDP in Device:Port 24a60b000000:0 receiving frame 180c200000e:24a600
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  43  75  72  6c  79  0  0    : Curly  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  1  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (297)
+***** TLV Copy Constructor executed for type 9 ***** (297)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2
@@ -3347,6 +3659,12 @@ Time 297:  LLDP in Device:Port 24a60b010000:10000 receiving frame 180c200000e:24
     Received TLV type = 3 and length = 2 : 6  2  0  1f  
     Received TLV type = 5 and length = 7 : a  7  4c  61  72  72  79  0  0    : Larry  
     Received TLV type = 9 and length = 28 : 12  1c  24  a6  0  0  0  0  0  0  0  3  1  2  0  0  1  2  2  2  0  0  2  2  3  1  0  0  3  1  
+    LLDPDU is from a known neighbor is true  and index is 0
+***** TLV Copy Constructor executed for type 5 ***** (297)
+***** TLV Copy Constructor executed for type 9 ***** (297)
+Destructor for TLV of type 5  and length 7
+Destructor for TLV of type 9  and length 28
+    After xRxManifest size of nbors is 1 and first nbor has XPDUs:  xpdu 0 has 2 TLVs  xpdu 1 has 0 TLVs  xpdu 2 has 0 TLVs  xpdu 3 has 0 TLVs  with change = 0
 Destructor for TLV of type 1  and length 7
 Destructor for TLV of type 2  and length 5
 Destructor for TLV of type 3  and length 2

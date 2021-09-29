@@ -283,7 +283,7 @@ void LldpPort::test_removeNbor()
 		SimLog::logFile << SimLog::Time << ":  first call sets pXpduMap to nullptr" << endl;
 		nborMIBs[0].pXpduMap = nullptr;       //     remove xpdu map at the start of the list
 	}
-	if ((SimLog::Time == 35) && (nborMIBs.size() > 0))       // if there is a neighbor MIB entry
+	if (((SimLog::Time == 35) || (SimLog::Time == 50)) && (nborMIBs.size() > 0))       // if there is a neighbor MIB entry
 	{
 		SimLog::logFile << SimLog::Time << ":  second call removes entire nbor" << endl;
 		nborMIBs.pop_back();       //     remove the neighbor at the end of the list

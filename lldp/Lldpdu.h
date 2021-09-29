@@ -99,6 +99,7 @@ class xpduDescriptor
 public:
 	xpduDescriptor(unsigned char numIn = 0, unsigned char revIn = 0, unsigned long checkIn = 0);
 	~xpduDescriptor();
+	bool operator== (xpduDescriptor& desc);
 
 	unsigned char num;
 	unsigned char rev;

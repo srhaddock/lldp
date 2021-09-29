@@ -154,6 +154,7 @@ void basicLldpTest(std::vector<unique_ptr<Device>>& Devices)
 				{
 					LldpPort& port = *LLDP.pLldpPorts[j];
 					port.set_lldpV2Enabled(true);
+					port.test_removeNbor();
 				}
 			}
 		}

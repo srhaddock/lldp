@@ -260,7 +260,7 @@ LldpPort::LldpRxSM::RxSmStates LldpPort::LldpRxSM::enterRxFrame(LldpPort& port)
 		rxUpdateInfo(port);
 		break;
 	case RxTypes::MANIFEST:
-		if (xRxManifest(port)) rxUpdateInfo(port);
+		if (xRxManifest(port, rxLldpdu)) rxUpdateInfo(port);
 		break;
 	case RxTypes::XPDU:
 		if (xRxXPDU(port)) rxUpdateInfo(port);
@@ -306,30 +306,12 @@ void LldpPort::LldpRxSM::rxNormal(LldpPort& port, Lldpdu& rxLldpdu)
 			size += tlv.getLength();
 		if (roomForNewNeighbor(port, size))                        //    and if have room
 		{
-			createNeighbor(port, rxTlvs);                             //    then create new neighbor MIB entry
-//			port.nborMIBs[index].pManXpdus[0]->xpduTlvs = rxTlvs;     //    and copy the new TLVs
+			createNeighbor(port, rxTlvs, true);                    //    then create new neighbor MIB entry with tlvs
 			nborChanged = true; 
 		}
 	}
 	else
 	{
-		/*
-		if (port.nborMIBs[index].pManXpdus.size() != 1)          // if more than one LLDPDU previously received
-		{
-			port.nborMIBs[index].pManXpdus.clear();     // Delete any old XPDU info
-			port.nborMIBs[index].pManXpdus.push_back(make_shared<manXpdu>(0, 0, 0));  // Add a pointer to "xpdu 0" with no tlvs
-			nborChanged = true;
-		}
-		bool tlvsMatch = port.nborMIBs[index].pManXpdus[0]->xpduTlvs.size() == rxTlvs.size();
-		if (tlvsMatch)                                                // see if new TLVs match old
-			for (unsigned int i = 0; i < rxTlvs.size(); i++)
-				tlvsMatch &= port.nborMIBs[index].pManXpdus[0]->xpduTlvs[i] == rxTlvs[i];
-		if (!tlvsMatch)                                               // if new TLVs don't match old
-		{
-			port.nborMIBs[index].pManXpdus[0]->xpduTlvs = rxTlvs;     //    then copy the new TLVs
-			nborChanged = true;       // Note this will signal something changed even if only TTL changed.
-		}
-		/**/
 		map<unsigned char, xpduMapEntry>& nborMap = *(port.nborMIBs[index].pXpduMap);
 
 		if (nborMap.size() != 1)           // if more than one LLDPDU previously recieved
@@ -338,10 +320,7 @@ void LldpPort::LldpRxSM::rxNormal(LldpPort& port, Lldpdu& rxLldpdu)
 			nborMap.clear();                                     // clear out old xpdu entries
 			nborMap.insert(make_pair(0, normalLldpduMapEntry));  // restore old map entry for Normal LLDPDU
 		}
-		bool tlvsMatch = nborMap.at(0).pTlvs.size() == (rxTlvs.size() - 3);
-		if (tlvsMatch && (rxTlvs.size() > 3))                                                // see if new TLVs match old
-			for (unsigned int i = 0; i < (rxTlvs.size() - 3); i++)
-				tlvsMatch &= *(nborMap.at(0).pTlvs[i]) == rxTlvs[i + 3];
+		bool tlvsMatch = compareTlvs( nborMap.at(0).pTlvs, rxTlvs);
 		if (!tlvsMatch && (rxTlvs.size() > 3))                                               // if new TLVs don't match old
 		{
 			nborMap.at(0).pTlvs.clear();                                                     //    then clear old TLVs      
@@ -359,15 +338,124 @@ void LldpPort::LldpRxSM::rxNormal(LldpPort& port, Lldpdu& rxLldpdu)
 	}
 	SimLog::logFile << " with change = " << nborChanged << endl;
 
-	//TODO: clear out any residual XPDU info if have previously received manifest
 	//TODO: init neighbor specific timers
 
 }
 
-bool LldpPort::LldpRxSM::xRxManifest(LldpPort& port) // returns true if manifest is complete
+bool LldpPort::LldpRxSM::xRxManifest(LldpPort& port, Lldpdu& rxLldpdu) // returns true if manifest is complete
 {
-	//TODO: process manifest
-	//TODO: init neighbor specific timers
+	bool manifestComplete = true;
+
+	bool nborChanged = false;
+	std::vector<TLV>& rxTlvs = rxLldpdu.tlvs;
+	unsigned int manifestTlvIndex = 0;
+	for (unsigned int i = 3; ((i < rxTlvs.size()) && (manifestTlvIndex == 0)); i++) // Find manifest TLV
+		if (rxTlvs[i].getType() == TLVtypes::MANIFEST)
+			manifestTlvIndex = i;
+	if (manifestTlvIndex == 0)
+	{
+		SimLog::logFile << "(" << SimLog::Time << ") in xRxManifest but cannot find manifest TLV" << endl;
+	}
+	else
+	{
+		tlvManifest& rxManTLV = static_cast<tlvManifest&>(rxTlvs[manifestTlvIndex]);   // If got here, there must be manifest TLV
+		unsigned int index = findNborIndex(port, rxTlvs);
+		if (index == port.nborMIBs.size())                             // if didn't find nbor
+		{
+			unsigned long size = rxManTLV.getTotalSize();              // then find size of new neighbor
+			if (roomForNewNeighbor(port, size))                        //    and if have room
+			{
+				createNeighbor(port, rxTlvs, false);                        //    then create new neighbor MIB entry without tlvs
+//				nborChanged = true;  // Don't signal neighbor changed until move new info to current XPDU map
+			}
+			else
+			{
+				// TODO:  If no room then discard frame (and increment counters?)
+			}
+		}
+		if (index < port.nborMIBs.size())   // unless discarded frame because no room, will now have index to neighbor MIB entry
+		{
+			MibEntry& nbor = port.nborMIBs[index];
+			bool tlvsMatch = compareTlvs(nbor.pXpduMap->at(0).pTlvs, rxTlvs);  // Compare current TLVs for XPDU0 to those in Manifest LLDPDU
+			if (tlvsMatch)                                                     // If they match then no change to neighbor
+			{
+				nbor.rxTtl = (static_cast<TlvTtl&>(rxTlvs[2])).getTtl();       //       so just save received TTL value
+				nbor.ttlTimer = nbor.rxTtl;                                    //       and restart timer
+				nbor.pNewXpduMap = nullptr;                                    //       and discard any partially completed manifest
+			}
+			else                  // If new TLVs are different then need to create a new XPDU Map from the received Manifest TLV
+			// TODO: Could optimize(?) my comparing received Manifest TLV to current.  If the same then only XPDU0 tlvs changed so could update
+			//          nbor without creating entire new XPDU map just to discover all other XPDUs are current.
+			// TODO: Could optimize case where received Manifest LLDPDU exactly matches partially completed Manifest LLDPDU.  If the same then 
+			//          only have to change status requested and retried to update, but not create entire new map.
+			// TODO: Somewhere handle case of Manifest TLV with no XPDU Descriptors
+			// TODO:  handle case where just enabled LLDPV2 so have manifest TLV in XPDU 0 but no other manifest entries
+			{
+				shared_ptr<map<unsigned char, xpduMapEntry>> pManXpduMap = make_shared<map<unsigned char, xpduMapEntry>>(); 
+				xpduMapEntry newNborMapEntry;                        // Create xpdu map entry for Normal LLDPDU
+				newNborMapEntry.sizeXpduTlvs = 6 + nbor.chassisID.getLength() + nbor.portID.getLength(); // in this entry include first 3 tlv lengths
+				//TODO:  Think the cumulative size of TLVs is really only needed on localMIB (for transmitting a manifest)
+				newNborMapEntry.xpduDesc = xpduDescriptor(0, 0, 0);
+				if (rxTlvs.size() > 3)                // If have more than first three mandatory TLVs to copy (which better be true since have manifest TLV
+					for (size_t i = 3; i < rxTlvs.size(); i++)
+					{
+						newNborMapEntry.sizeXpduTlvs += (2 + rxTlvs[i].getLength());   // update cumulative size of tlvs
+						newNborMapEntry.pTlvs.push_back(make_shared<TLV>(rxTlvs[i]));  // copy TLVs and put pointers in map
+					}
+				pManXpduMap->insert(make_pair(0, newNborMapEntry));  // Put xpdu map entry in map with key=0
+
+				for (unsigned int i = 0; i < rxManTLV.getNumXpdus(); i++)              // For each xpdu descriptor in manifest TLV
+				{ 
+					newNborMapEntry.sizeXpduTlvs = 0;                                  //     Create a xpdu map entry with zero size
+					newNborMapEntry.xpduDesc = rxManTLV.getXpduDescriptor(i);          //     Copy the xpdu descriptor from the manifest TLV
+					newNborMapEntry.status = RxXpduStatus::UPDATE;                     //     Assume need to request XPDU in Extension LLDPDU
+					newNborMapEntry.pTlvs.clear();                                     //     No TLVs yet
+					auto oldXpdu = nbor.pXpduMap->find(newNborMapEntry.xpduDesc.num);  //     Search current XPDU map for this XPDU number
+					if ((oldXpdu != nbor.pXpduMap->end()) && 
+						(oldXpdu->second.xpduDesc == newNborMapEntry.xpduDesc))        //     If found and descriptors match
+					{
+						newNborMapEntry.pTlvs = oldXpdu->second.pTlvs;                 //          then copy pointers to tlvs in current XPDU map to new map
+						newNborMapEntry.sizeXpduTlvs = oldXpdu->second.sizeXpduTlvs;   //          and copy size
+						newNborMapEntry.status = RxXpduStatus::CURRENT;                //          and set status to current so don't request Extension LLDPDU
+					}
+					else if (nbor.pNewXpduMap)                                         //     If no current XPDU, but have partially completed manifest
+					{
+						oldXpdu = nbor.pNewXpduMap->find(newNborMapEntry.xpduDesc.num);    //     Search partial XPDU map for this XPDU number
+						if ((oldXpdu != nbor.pNewXpduMap->end()) && 
+							(oldXpdu->second.xpduDesc == newNborMapEntry.xpduDesc) &&
+							(oldXpdu->second.status == RxXpduStatus::NEW))                 //     If found and descriptors match and have new tlvs
+						{
+							newNborMapEntry.pTlvs = oldXpdu->second.pTlvs;                 //          then copy partial XPDU map tlv pointers to new map entry
+							newNborMapEntry.sizeXpduTlvs = oldXpdu->second.sizeXpduTlvs;   //          and copy size
+							newNborMapEntry.status = RxXpduStatus::NEW;                    //          and set status to new so don't request Extension LLDPDU
+						}
+					}
+					else
+					{
+						manifestComplete = false;          // left with at least one XPDU with status UPDATE, so manifest not complete
+					}
+					pManXpduMap->insert(make_pair(newNborMapEntry.xpduDesc.num, newNborMapEntry));  //     Put xpdu map entry in map with key = xpdu number
+				}
+				nbor.pNewXpduMap = pManXpduMap;          // Store pointer to new XPDU map (overwriting pointer to any partially completed manifest
+			}
+
+		}
+
+		SimLog::logFile << "    After xRxManifest size of nbors is " << port.nborMIBs.size();
+		if ((port.nborMIBs.size() > 0) && (port.nborMIBs[0].pNewXpduMap))
+		{
+			SimLog::logFile << " and first nbor has XPDUs: ";
+			for (auto& mapEntry : (*port.nborMIBs[0].pNewXpduMap))
+			{
+				SimLog::logFile << " xpdu " << (unsigned short)mapEntry.first;
+				SimLog::logFile << " has " << mapEntry.second.pTlvs.size() << " TLVs ";
+			}
+		}
+		SimLog::logFile << " with change = " << nborChanged << endl;
+
+		//TODO: init neighbor specific timers
+
+	}
 
 	return(xRxCheckManifest(port));
 }
@@ -449,7 +537,7 @@ unsigned int LldpPort::LldpRxSM::findNborIndex(LldpPort& port, std::vector<TLV>&
 	else SimLog::logFile << "false ";
 	SimLog::logFile << " and index is " << index << endl;
 
-	return (index);
+	return (index);        // index will equal nborMIBs.size if no matching neighbor found
 }
 /**/
 
@@ -462,7 +550,7 @@ unsigned int LldpPort::LldpRxSM::findNborIndex(LldpPort& port, std::vector<TLV>&
  }
 /**/
 
- void LldpPort::LldpRxSM::createNeighbor(LldpPort& port, std::vector<TLV>& tlvs)
+ void LldpPort::LldpRxSM::createNeighbor(LldpPort& port, std::vector<TLV>& tlvs, bool copyTlvs)
  {
 	 MibEntry newNbor;                   // Create a MIB entry for new neighbor
 	 newNbor.chassisID = tlvs[0];        // Fill in Chassis ID, Port ID, and TTL
@@ -470,8 +558,10 @@ unsigned int LldpPort::LldpRxSM::findNborIndex(LldpPort& port, std::vector<TLV>&
 	 newNbor.rxTtl = (static_cast<TlvTtl&>(tlvs[2])).getTtl();
 
 	 xpduMapEntry newNborMapEntry;        // Create xpdu map entry for Normal LLDPDU
+	 newNborMapEntry.sizeXpduTlvs = 6+ newNbor.chassisID.getLength() + newNbor.portID.getLength(); // in this entry include first 3 tlv lengths
+	 //TODO:  Think the cumulative size of TLVs is really only needed on localMIB (for transmitting a manifest)
 	 newNborMapEntry.xpduDesc = xpduDescriptor(0, 0, 0);
-	 if (tlvs.size() > 3)                // If have more than first three mandatory TLVs
+	 if (copyTlvs && (tlvs.size() > 3))                // If have more than first three mandatory TLVs to copy
 		 for (size_t i = 3; i < tlvs.size(); i++)
 		 {
 			 newNborMapEntry.sizeXpduTlvs += (2 + tlvs[i].getLength());   // update cumulative size of tlvs
@@ -482,6 +572,15 @@ unsigned int LldpPort::LldpRxSM::findNborIndex(LldpPort& port, std::vector<TLV>&
 	 port.nborMIBs.push_back(newNbor);   // Add MIB entry to list of neighbors
  }
 
+ bool LldpPort::LldpRxSM::compareTlvs(vector<shared_ptr<TLV>>& pTlvs, vector<TLV>& rxTlvs)
+ {
+	 bool tlvsMatch = pTlvs.size() == (rxTlvs.size() - 3);
+	 if (tlvsMatch && (rxTlvs.size() > 3))                                                // see if new TLVs match old
+		 for (unsigned int i = 0; i < (rxTlvs.size() - 3); i++)
+			 tlvsMatch &= *(pTlvs[i]) == rxTlvs[i + 3];
+
+	 return (tlvsMatch);
+ }
 
 
 
