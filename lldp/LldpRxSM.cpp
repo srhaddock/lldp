@@ -177,6 +177,7 @@ LldpPort::LldpRxSM::RxTypes LldpPort::LldpRxSM::rxProcessFrame(LldpPort& port)
 				(rxLldpdu.tlvs[0] == port.localMIB.chassisID) &&           //    and Chassis ID and Port ID match 
 				(rxLldpdu.tlvs[1] == port.localMIB.portID))                //        this LLDP agent
 				// Later will verify that the chassis ID and Port ID match this LLDP agent
+				//TODO:  check returnAddress != 0 ?
 			{
 				rxType = RxTypes::XREQ;                                    //    then Extension Request LLDPDU
 			}
@@ -217,6 +218,7 @@ LldpPort::LldpRxSM::RxTypes LldpPort::LldpRxSM::rxProcessFrame(LldpPort& port)
 
 	if (rxType == RxTypes::INVALID)          // if type is invalid
 	{
+		SimLog::logFile << "Time " << SimLog::Time << ":  Received INVALID LLDPDU !!!!!!!!!!!!!!!" << endl;
 		//TODO:  increment error counters
 	}
 	else if ((rxType != XREQ) && (port.adminStatus == adminStatusVals::ENABLED_TX_ONLY))
@@ -253,17 +255,19 @@ LldpPort::LldpRxSM::RxSmStates LldpPort::LldpRxSM::enterRxFrame(LldpPort& port)
 		rxDeleteInfo(port);
 		break;
 	case RxTypes::XREQ:
-		generateXREQ(port);
+		rxXREQ(port, rxLldpdu);
 		break;
 	case RxTypes::NORMAL:
 		rxNormal(port, rxLldpdu);
-		rxUpdateInfo(port);
+//		rxUpdateInfo(port);
 		break;
 	case RxTypes::MANIFEST:
-		if (xRxManifest(port, rxLldpdu)) rxUpdateInfo(port);
+		xRxManifest(port, rxLldpdu);
+//		if (xRxManifest(port, rxLldpdu)) rxUpdateInfo(port);
 		break;
 	case RxTypes::XPDU:
-		if (xRxXPDU(port)) rxUpdateInfo(port);
+		xRxXPDU(port, rxLldpdu);
+//		if (xRxXPDU(port, rxLldpdu)) rxUpdateInfo(port);
 		break;
 	case RxTypes::INVALID:
 	default:
@@ -306,7 +310,8 @@ void LldpPort::LldpRxSM::rxNormal(LldpPort& port, Lldpdu& rxLldpdu)
 			size += tlv.getLength();
 		if (roomForNewNeighbor(port, size))                        //    and if have room
 		{
-			createNeighbor(port, rxTlvs, true);                    //    then create new neighbor MIB entry with tlvs
+			createNeighbor(port, rxTlvs, true);                    //    then create new neighbor MIB entry (with tlvs) at index value
+			port.nborMIBs[index].ttlTimer = port.nborMIBs[index].rxTtl;     //       and restart timer
 			nborChanged = true; 
 		}
 	}
@@ -314,20 +319,22 @@ void LldpPort::LldpRxSM::rxNormal(LldpPort& port, Lldpdu& rxLldpdu)
 	{
 		map<unsigned char, xpduMapEntry>& nborMap = *(port.nborMIBs[index].pXpduMap);
 
-		if (nborMap.size() != 1)           // if more than one LLDPDU previously recieved
+		if (nborMap.size() != 1)           // if previously received Manifest and XPDU LLDPDUs
 		{
 			xpduMapEntry normalLldpduMapEntry = nborMap.at(0);   // save old map entry for Normal LLDPDU
 			nborMap.clear();                                     // clear out old xpdu entries
 			nborMap.insert(make_pair(0, normalLldpduMapEntry));  // restore old map entry for Normal LLDPDU
 		}
 		bool tlvsMatch = compareTlvs( nborMap.at(0).pTlvs, rxTlvs);
-		if (!tlvsMatch && (rxTlvs.size() > 3))                                               // if new TLVs don't match old
+		if (!tlvsMatch)                                                            // if new TLVs don't match old
 		{
-			nborMap.at(0).pTlvs.clear();                                                     //    then clear old TLVs      
-			for (unsigned int i = 0; i < (rxTlvs.size() - 3); i++)                           //    and for each new TLV
-				nborMap.at(0).pTlvs[i] = make_shared<TLV>(rxTlvs[i + 3]);                    //  copy TLV and put pointer in map
-			nborChanged = true;       // Note this will signal something changed even if only TTL changed.
+			nborMap.at(0).pTlvs.clear();                                           //    then clear old TLVs      
+			for (unsigned int i = 0; i < (rxTlvs.size() - 3); i++)                 //    and for each new TLV
+				nborMap.at(0).pTlvs[i] = make_shared<TLV>(rxTlvs[i + 3]);          //        copy TLV and put pointer in map
+			nborChanged = true;                                                    //    Note that something changed 
 		}
+		port.nborMIBs[index].rxTtl = (static_cast<TlvTtl&>(rxTlvs[2])).getTtl();       //       Save received TTL value
+		port.nborMIBs[index].ttlTimer = port.nborMIBs[index].rxTtl;                    //       and restart timer
 	}
 	
 	SimLog::logFile << "    After rxNormal size of nbors is " << port.nborMIBs.size();
@@ -342,9 +349,9 @@ void LldpPort::LldpRxSM::rxNormal(LldpPort& port, Lldpdu& rxLldpdu)
 
 }
 
-bool LldpPort::LldpRxSM::xRxManifest(LldpPort& port, Lldpdu& rxLldpdu) // returns true if manifest is complete
+void LldpPort::LldpRxSM::xRxManifest(LldpPort& port, Lldpdu& rxLldpdu) // returns true if manifest is complete
 {
-	bool manifestComplete = true;
+	bool manifestComplete = false;
 
 	bool nborChanged = false;
 	std::vector<TLV>& rxTlvs = rxLldpdu.tlvs;
@@ -376,7 +383,11 @@ bool LldpPort::LldpRxSM::xRxManifest(LldpPort& port, Lldpdu& rxLldpdu) // return
 		if (index < port.nborMIBs.size())   // unless discarded frame because no room, will now have index to neighbor MIB entry
 		{
 			MibEntry& nbor = port.nborMIBs[index];
-			bool tlvsMatch = compareTlvs(nbor.pXpduMap->at(0).pTlvs, rxTlvs);  // Compare current TLVs for XPDU0 to those in Manifest LLDPDU
+			nbor.nborAddr = rxManTLV.getReturnAddr();                          // Save return address for XREQs
+
+			SimLog::logFile << "               Saving return address from manifest TLV: " << hex << nbor.nborAddr << dec << endl;
+
+			bool tlvsMatch = compareTlvs(nbor.pXpduMap->at(0).pTlvs, rxTlvs);  // Compare current TLVs for XPDU0, including Manifest TLV, to new LLDPDU
 			if (tlvsMatch)                                                     // If they match then no change to neighbor
 			{
 				nbor.rxTtl = (static_cast<TlvTtl&>(rxTlvs[2])).getTtl();       //       so just save received TTL value
@@ -421,7 +432,7 @@ bool LldpPort::LldpRxSM::xRxManifest(LldpPort& port, Lldpdu& rxLldpdu) // return
 					else if (nbor.pNewXpduMap)                                         //     If no current XPDU, but have partially completed manifest
 					{
 						oldXpdu = nbor.pNewXpduMap->find(newNborMapEntry.xpduDesc.num);    //     Search partial XPDU map for this XPDU number
-						if ((oldXpdu != nbor.pNewXpduMap->end()) && 
+						if ((oldXpdu != nbor.pNewXpduMap->end()) &&
 							(oldXpdu->second.xpduDesc == newNborMapEntry.xpduDesc) &&
 							(oldXpdu->second.status == RxXpduStatus::NEW))                 //     If found and descriptors match and have new tlvs
 						{
@@ -430,15 +441,12 @@ bool LldpPort::LldpRxSM::xRxManifest(LldpPort& port, Lldpdu& rxLldpdu) // return
 							newNborMapEntry.status = RxXpduStatus::NEW;                    //          and set status to new so don't request Extension LLDPDU
 						}
 					}
-					else
-					{
-						manifestComplete = false;          // left with at least one XPDU with status UPDATE, so manifest not complete
-					}
 					pManXpduMap->insert(make_pair(newNborMapEntry.xpduDesc.num, newNborMapEntry));  //     Put xpdu map entry in map with key = xpdu number
 				}
 				nbor.pNewXpduMap = pManXpduMap;          // Store pointer to new XPDU map (overwriting pointer to any partially completed manifest
-			}
 
+				manifestComplete = xRxCheckManifest(port, nbor);
+			}
 		}
 
 		SimLog::logFile << "    After xRxManifest size of nbors is " << port.nborMIBs.size();
@@ -448,35 +456,155 @@ bool LldpPort::LldpRxSM::xRxManifest(LldpPort& port, Lldpdu& rxLldpdu) // return
 			for (auto& mapEntry : (*port.nborMIBs[0].pNewXpduMap))
 			{
 				SimLog::logFile << " xpdu " << (unsigned short)mapEntry.first;
-				SimLog::logFile << " has " << mapEntry.second.pTlvs.size() << " TLVs ";
+				SimLog::logFile << " has " << mapEntry.second.pTlvs.size() << " TLVs w/ status ";
+				SimLog::logFile << " status " << mapEntry.second.status << "; ";
 			}
 		}
-		SimLog::logFile << " with change = " << nborChanged << endl;
+		SimLog::logFile << " manifestComplete = " << manifestComplete << endl;
 
 		//TODO: init neighbor specific timers
 
 	}
 
-	return(xRxCheckManifest(port));
+	// Store new neighbor MIB entry if have received all XPDUs
+	if (manifestComplete) rxUpdateInfo(port);
+
+//	return(manifestComplete);
 }
 
-bool LldpPort::LldpRxSM::xRxXPDU(LldpPort& port)  // returns true if manifest is complete
+void LldpPort::LldpRxSM::xRxXPDU(LldpPort& port, Lldpdu& rxLldpdu)  // returns true if manifest is complete
 {
-	bool xReqComplete = false;
-	//TODO: process XPDU  setting xReqComplete as appropriate
-
-	if (xReqComplete)          // If all XPDUs for this XREQ received, then check manifest
-		return(xRxCheckManifest(port));  
-	else
-		return(false);         // Manifest is not complete if not all XPDUs received
-}
-
-bool LldpPort::LldpRxSM::xRxCheckManifest(LldpPort& port)  // returns true if manifest is complete
-{
+	bool unexpectedXPDU = true;
 	bool manifestComplete = false;
-	//TODO: check manifest setting manifestComplete as appropriate
 
-	if (!manifestComplete) generateXREQ(port);
+	std::vector<TLV>& rxTlvs = rxLldpdu.tlvs;
+
+	unsigned int index = findNborIndex(port, rxTlvs);
+	if ((index != port.nborMIBs.size()) && (port.nborMIBs[index].pNewXpduMap != nullptr)) // if found nbor and nbor has a new XPDU map
+	{
+		MibEntry& nbor = port.nborMIBs[index];
+		map<unsigned char, xpduMapEntry>& newXpduMap = *(nbor.pNewXpduMap);
+		tlvXID& rxXidTLV = static_cast<tlvXID&>(rxTlvs[2]);   // If got here, there must be XID TLV
+		xpduDescriptor rxDesc = rxXidTLV.getXpduDescriptor();
+
+		SimLog::logFile << "    Trying to find nbor new map entry for XPDU number " << (unsigned short)rxDesc.num << " rev " << (unsigned short)rxDesc.rev ;
+
+		auto mapEntry = newXpduMap.find(rxDesc.num);                    //     Search new XPDU map for this XPDU number
+	
+		if (mapEntry != newXpduMap.end())
+			SimLog::logFile << " success" << endl;
+		else
+			SimLog::logFile << " WITHOUT SUCCESS !!" << endl;
+
+		if ((mapEntry != newXpduMap.end()) &&                       //     If found
+			((mapEntry->second.xpduDesc).rev == rxDesc.rev) &&            //        and revision matches
+			(port.lldpScopeAddress == rxXidTLV.getScopeAddr())         //        and scope address match
+			//TODO:  also need to calculate checksum and validate
+			//TODO:  check that rxDesc.num > 0
+			)
+		{
+			mapEntry->second.sizeXpduTlvs = 0;    // Clear out old TLVs
+			mapEntry->second.pTlvs.clear();
+			if (rxTlvs.size() > 3)                // If have more than first three mandatory TLVs to copy 
+				for (size_t i = 3; i < rxTlvs.size(); i++)
+				{
+					mapEntry->second.sizeXpduTlvs += (2 + rxTlvs[i].getLength());   // update cumulative size of tlvs
+					mapEntry->second.pTlvs.push_back(make_shared<TLV>(rxTlvs[i]));  // copy TLVs and put pointers in map
+				}
+			mapEntry->second.status = RxXpduStatus::NEW;                //          and set status
+			unexpectedXPDU = false;
+
+			manifestComplete = xRxCheckManifest(port, nbor);
+		}
+
+	}
+
+	SimLog::logFile << "    After xRxXPDU for nbor " << index;
+	if ((port.nborMIBs.size() > 0) && (port.nborMIBs[index].pNewXpduMap))
+	{
+		SimLog::logFile << " and nbor has XPDUs: ";
+		for (auto& mapEntry : (*port.nborMIBs[index].pNewXpduMap))
+		{
+			SimLog::logFile << " xpdu " << (unsigned short)mapEntry.first;
+			SimLog::logFile << " has " << mapEntry.second.pTlvs.size() << " TLVs w/ status ";
+			SimLog::logFile << mapEntry.second.status << ";";
+		}
+	}
+	SimLog::logFile << " with unexpected XPDU = " << unexpectedXPDU << endl;
+
+	// Store new neighbor MIB entry if have received all XPDUs
+	if (manifestComplete) rxUpdateInfo(port);
+
+//	return(manifestComplete);
+}
+
+bool LldpPort::LldpRxSM::xRxCheckManifest(LldpPort& port, MibEntry& nbor)  // returns true if manifest is complete
+{
+	bool manifestComplete = true;
+	bool xReqComplete = true;
+	xpduDescriptor first;
+	xpduDescriptor second;
+	unsigned char xpduCount = 0;
+
+	for (auto& mapEntry : *nbor.pNewXpduMap)
+	{   // Search in order.  Important that request in order, so any with status Requested or Retried are before Update
+		RxXpduStatus xpduStatus = mapEntry.second.status;
+		if ((xpduStatus == RxXpduStatus::REQUESTED) || (xpduStatus == RxXpduStatus::RETRIED))
+		{
+			xReqComplete = false;
+			manifestComplete = false;
+			break;
+		}
+		if (xpduStatus == RxXpduStatus::UPDATE)
+		{
+			manifestComplete = false;
+			if (xpduCount < 2)
+			{
+				xpduCount++;
+				mapEntry.second.status = RxXpduStatus::REQUESTED;
+				if (xpduCount == 1)
+				{
+					first = mapEntry.second.xpduDesc;
+				}
+				else
+				{
+					second = mapEntry.second.xpduDesc;
+					break;
+				}
+			}
+		}
+	}
+
+	// Transmit XREQ if no outstanding requests, and more XPDUs to be updated, and attached to a MAC
+	if (xReqComplete && !manifestComplete && port.pIss && nbor.nborAddr)  
+	{
+		tlvREQ newReq(port.pIss->getMacAddress(), port.lldpScopeAddress, xpduCount);
+		newReq.putXpduDescriptor(0, first);
+		if (xpduCount > 1)
+			newReq.putXpduDescriptor(1, second);
+
+		shared_ptr<Lldpdu> pMyLldpdu = std::make_shared<Lldpdu>();      // Create LLDPDU
+		pMyLldpdu->tlvs.push_back(nbor.chassisID);                      // Add Chassis ID of nbor sourcing info
+		pMyLldpdu->tlvs.push_back(nbor.portID);                         // Add Port ID
+		pMyLldpdu->tlvs.push_back(newReq);                              // Copy XREQ TLV to LLDPDU
+		unique_ptr<Frame> myFrame = make_unique<Frame>(nbor.nborAddr, port.pIss->getMacAddress(), (shared_ptr<Sdu>)pMyLldpdu);
+		port.pIss->Request(move(myFrame));                              // Transmit frame
+
+		unsigned short requestTime = (nbor.rxTtl + 63) >> 5;            // Round up rxTTL/32, and add 1 (in case next timer tick comes immediately)
+		if (nbor.ttlTimer > requestTime)
+		{
+			nbor.restoreTime = nbor.ttlTimer - requestTime;
+			nbor.ttlTimer = requestTime;
+		}
+		else
+			nbor.restoreTime = 0;
+
+		SimLog::logFile << "Time " << SimLog::Time << ": xRxCheckManifest transmitting XREQ to " << hex << nbor.nborAddr << dec << " for " << (unsigned short)newReq.getNumXpdus();
+		SimLog::logFile << ": xpdu num " << (unsigned short)newReq.getXpduDescriptor(0).num << " rev " << (unsigned short)newReq.getXpduDescriptor(0).rev;
+		if (xpduCount > 1)
+			SimLog::logFile << " and xpdu num " << (unsigned short)newReq.getXpduDescriptor(1).num << " rev " << (unsigned short)newReq.getXpduDescriptor(1).rev;
+		SimLog::logFile << " time limit " << requestTime << endl;
+	}
 
 	return (manifestComplete);
 }
@@ -495,7 +623,7 @@ void LldpPort::LldpRxSM::rxDeleteInfo(LldpPort& port)
 
 }
 
-
+/*
 void LldpPort::LldpRxSM::generateXREQ(LldpPort& port)
 {
 	//TODO:  generateXREQ
@@ -556,6 +684,7 @@ unsigned int LldpPort::LldpRxSM::findNborIndex(LldpPort& port, std::vector<TLV>&
 	 newNbor.chassisID = tlvs[0];        // Fill in Chassis ID, Port ID, and TTL
 	 newNbor.portID = tlvs[1];
 	 newNbor.rxTtl = (static_cast<TlvTtl&>(tlvs[2])).getTtl();
+	 newNbor.ttlTimer = 0;               // Initialize timer to zero, in case just received Manifest LLDPDU
 
 	 xpduMapEntry newNborMapEntry;        // Create xpdu map entry for Normal LLDPDU
 	 newNborMapEntry.sizeXpduTlvs = 6+ newNbor.chassisID.getLength() + newNbor.portID.getLength(); // in this entry include first 3 tlv lengths
@@ -574,12 +703,42 @@ unsigned int LldpPort::LldpRxSM::findNborIndex(LldpPort& port, std::vector<TLV>&
 
  bool LldpPort::LldpRxSM::compareTlvs(vector<shared_ptr<TLV>>& pTlvs, vector<TLV>& rxTlvs)
  {
-	 bool tlvsMatch = pTlvs.size() == (rxTlvs.size() - 3);
-	 if (tlvsMatch && (rxTlvs.size() > 3))                                                // see if new TLVs match old
+	 bool tlvsMatch = pTlvs.size() == (rxTlvs.size() - 3);            // potential match if have the same number of TLVs
+	 if (tlvsMatch && (rxTlvs.size() > 3))                            // see if new TLVs match old
 		 for (unsigned int i = 0; i < (rxTlvs.size() - 3); i++)
 			 tlvsMatch &= *(pTlvs[i]) == rxTlvs[i + 3];
 
-	 return (tlvsMatch);
+	 return (tlvsMatch);  // Note returns true if no TLVs as well as if all TLVs are the same
+ }
+
+ void LldpPort::LldpRxSM::rxXREQ(LldpPort& port, Lldpdu& rxLldpdu)
+ {
+	 // Think have already done all necessary validation.  Just send XPDU
+
+	 tlvREQ& rxXreqTLV = static_cast<tlvREQ&>(rxLldpdu.tlvs[2]);   // If got here, there must be XREQ TLV
+	 unsigned short numReq = rxXreqTLV.getNumXpdus();
+	 SimLog::logFile << "Time " << SimLog::Time << ":        Receiving XREQ for " << numReq << " XPDUs" << endl;
+	 for (unsigned short i = 0; i < numReq; i++)
+	 {
+		 xpduDescriptor desc = rxXreqTLV.getXpduDescriptor(i);     // Get the requested XPDU descriptor
+		 auto xpdu = port.localMIB.pXpduMap->find(desc.num);       // Search local MIB for that XPDU number
+		 if ((xpdu != port.localMIB.pXpduMap->end()) &&            //     If found
+			 (xpdu->second.xpduDesc == desc) && port.pIss)         //        and descriptor matches and attached to sublayer
+		 {
+			 shared_ptr<Lldpdu> pMyLldpdu = std::make_shared<Lldpdu>();                 // Create LLDPDU
+			 pMyLldpdu->tlvs.push_back(port.localMIB.chassisID);                        // Add Chassis ID 
+			 pMyLldpdu->tlvs.push_back(port.localMIB.portID);                           // Add Port ID
+			 pMyLldpdu->tlvs.push_back(tlvXID(port.lldpScopeAddress, desc));            // Create XID TLV
+			 for (auto& pInfoTLV : xpdu->second.pTlvs)                                // append information TLVs
+				 pMyLldpdu->tlvs.push_back(*pInfoTLV);
+			 unique_ptr<Frame> myFrame = make_unique<Frame>(rxXreqTLV.getReturnAddr(),  // Wrap it in a frame
+				 port.pIss->getMacAddress(), (shared_ptr<Sdu>)pMyLldpdu);
+			 port.pIss->Request(move(myFrame));                                         // Transmit the XPDU
+
+			 SimLog::logFile << "             Sending XPDU frame for num " << (unsigned short)desc.num << " rev " << (unsigned short)desc.rev << endl;
+			 tlvXID& newXid = static_cast<tlvXID&>(pMyLldpdu->tlvs[2]);
+		 }
+	 }
  }
 
 

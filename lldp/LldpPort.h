@@ -48,10 +48,12 @@ public:
 //	TLV ttl; 
 	unsigned short rxTtl;
 	unsigned short ttlTimer;
+	unsigned short restoreTime;
 	unsigned long totalSize;
+	unsigned long long nborAddr;
 
-	shared_ptr< map<unsigned char, xpduMapEntry>> pXpduMap;      // XPDU map for completely recieved Nbor TLVs
-	shared_ptr< map<unsigned char, xpduMapEntry>> pNewXpduMap;   // XPDU map that still needs to recieve Extension LLDPDUs
+	shared_ptr< map<unsigned char, xpduMapEntry>> pXpduMap;      // XPDU map for completely received Nbor TLVs
+	shared_ptr< map<unsigned char, xpduMapEntry>> pNewXpduMap;   // XPDU map that still needs to receive Extension LLDPDUs
 };
 
 class LldpPort : public IssQ
@@ -147,7 +149,6 @@ private:
 //		static RxSmStates enterRxExtended(LldpPort& port);
 //		static RxSmStates enterUpdateInfo(LldpPort& port);
 		static RxSmStates enterRemoteChanges(LldpPort& port);
-		static RxSmStates enterRxXpduRequest(LldpPort& port, const Lldpdu& rxLldpdu);
 
 		static void rxCheckTimers(LldpPort& port);
 		static RxTypes rxProcessFrame(LldpPort& port);
@@ -157,15 +158,16 @@ private:
 
 		static void createNeighbor(LldpPort& port, std::vector<TLV>& tlvs, bool copyTlvs);
 	//	static bool runRxExtended(LldpPort& port);
-		static bool xRxManifest(LldpPort& port, Lldpdu& rxLldpdu);
-		static bool xRxXPDU(LldpPort& port);
-		static bool xRxCheckManifest(LldpPort& port);
-		static void generateXREQ(LldpPort& port);
+		static void xRxManifest(LldpPort& port, Lldpdu& rxLldpdu);
+		static void xRxXPDU(LldpPort& port, Lldpdu& rxLldpdu);
+		static bool xRxCheckManifest(LldpPort& port, MibEntry& nbor);
+	//	static void generateXREQ(LldpPort& port);
 	//	static bool findNeighbor(LldpPort& port, std::vector<TLV>& tlvs, int index);
 		static unsigned int findNborIndex(LldpPort& port, std::vector<TLV>& tlvs);
 		static bool roomForNewNeighbor(LldpPort& port, unsigned long newNborSize);
 		static bool compareTlvs(vector<shared_ptr<TLV>>& pTlvs, vector<TLV>& rxTlvs);
-	/**/
+		static void rxXREQ(LldpPort& port, Lldpdu& rxLldpdu);
+	
 	};
 
 	LldpRxSM::RxSmStates RxSmState;

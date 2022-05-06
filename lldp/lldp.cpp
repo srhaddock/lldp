@@ -33,6 +33,10 @@ int main()
 	SimLog::Debug = 15; // 6 9
 	SimLog::Time = 0;
 
+	unsigned short testUint = 3;
+	testUint = testUint - 5;
+	SimLog::logFile << "Testing a negative result to unsigned short arithmetic:  5 - 3 = " << testUint << endl;
+
 //	void send8Frames(EndStn& source);
 	void basicLldpTest(std::vector<unique_ptr<Device>> & Devices);
 

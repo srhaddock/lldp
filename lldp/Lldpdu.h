@@ -123,31 +123,41 @@ public:
 };
 
 
-/*
+/**/
 class tlvREQ : public TLV
 {
 public:
-	tlvREQ();
+	tlvREQ(unsigned long long returnAddr = 0, unsigned long long scopeAddr = 0, unsigned char xpduCount = 0);
 	~tlvREQ();
 
 	unsigned long long returnAddr;
 	unsigned long long scopeAddr;
 	unsigned char rsvd;
 	unsigned char numXpdus;
-	std::vector<xpduDescriptor> xpduDescriptors;
+//	std::vector<xpduDescriptor> xpduDescriptors;
+
+	unsigned long long getReturnAddr();
+	unsigned long long getScopeAddr();
+	unsigned char getNumXpdus();
+	xpduDescriptor getXpduDescriptor(unsigned short position);
+	bool putXpduDescriptor(unsigned short position, xpduDescriptor desc);
 };
 
 class tlvXID : public TLV
 {
 public:
-	tlvXID();
+	tlvXID(unsigned long long scopeAddr = 0, xpduDescriptor desc = 0);
 	~tlvXID();
 
 	unsigned long long scopeAddr;
 	unsigned char xpduNum;
 	unsigned char xpduRev;
+
+	unsigned long long getScopeAddr();
+	xpduDescriptor getXpduDescriptor();
 };
 
+/*
 class tlvBasicString : public TLV
 {
 public:

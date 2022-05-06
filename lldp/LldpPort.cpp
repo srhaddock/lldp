@@ -24,7 +24,9 @@ MibEntry::MibEntry()
 	rxTtl = 0;
 	ttlTimer = 0;
 	totalSize = 0;
+	nborAddr = 0;
 	pXpduMap = make_shared<map<unsigned char, xpduMapEntry>>();
+	pNewXpduMap = nullptr;
 }
 
 MibEntry::~MibEntry()

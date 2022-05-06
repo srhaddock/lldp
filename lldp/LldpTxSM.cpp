@@ -209,11 +209,14 @@ void LldpPort::LldpTxSM::prepareLldpdu(LldpPort& port, Lldpdu& myLldpdu, unsigne
 		//	if (port.lldpV2Enabled && (myMap.size() > 1))       // If LLDPV2 and have xpdus in manifest
 		if ((myMap.size() > 1))       // If  have xpdus in manifest   // send even if not v2 for testing
 		{
-			SimLog::logFile << "    Creating manifest for " << myMap.size() << " XPDUs." << endl;
 			// Create manifest TLV and put in LLDPDU
 			unsigned char numXpdus = (unsigned char)myMap.size() - 1;
 			unsigned long totalSize = myMap.at(0).sizeXpduTlvs;  // Init total size with size of Normal LLDPDU
 			tlvManifest manifest(port.pIss->getMacAddress(), numXpdus);
+
+			SimLog::logFile << "    Creating manifest for " << (unsigned short)manifest.getNumXpdus() << " XPDUs" 
+				<< hex << " return " << manifest.getReturnAddr() << " : " << (unsigned short)manifest.getChar(2) << dec << endl;
+
 			unsigned short position = 0;
 			for (auto& xpduMapPair : myMap)
 			{

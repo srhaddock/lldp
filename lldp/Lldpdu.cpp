@@ -49,30 +49,39 @@ TLV::TLV(unsigned char type, unsigned short length)
 		v.push_back(0);
 	}
 
-//	cout << "Constructor for TLV with type " << (unsigned short)type << "  and length " << length
-//		<< hex << " : v[0] = 0x" << (unsigned short)v[0] 
-//		<< "  v[1] = 0x" << (unsigned short)v[1] << dec << endl;
+	/*
+	cout << "Constructor for TLV with type " << (unsigned short)type << "  and length " << length
+		<< hex << " : v[0] = 0x" << (unsigned short)v[0] 
+		<< "  v[1] = 0x" << (unsigned short)v[1] << dec << endl;
+	/*
 	if (SimLog::Time > 2)
 		SimLog::logFile << "Constructor for TLV with type " << (unsigned short)type << "  and length " << length
 		<< hex << " : v[0] = 0x" << (unsigned short)v[0]
 		<< "  v[1] = 0x" << (unsigned short)v[1] << dec << endl;
+	/**/
 }
 
 TLV::TLV(const TLV& copySource)  // Copy constructor
 {
 	v = copySource.v;
 	
-//	cout << "***** TLV Copy Constructor executed ***** (" << SimLog::Time << ")" << endl;
+	/*
+	cout << "***** TLV Copy Constructor executed ***** (" << SimLog::Time << ")" << endl;
+	/*
 	if (SimLog::Time > 2)
 		SimLog::logFile << "***** TLV Copy Constructor executed for type " << (unsigned short)getType()
 		<<  " ***** (" << SimLog::Time << ")" << endl;
+	/**/
 }
 
 TLV::~TLV()
 {
-//	cout << "Destructor for TLV of type " << getType() << endl;
+	/*
+	cout << "Destructor for TLV of type " << getType() << endl;
+	/*
 	if (SimLog::Time > 2)
 		SimLog::logFile << "Destructor for TLV of type " << getType() << "  and length " << getLength() << endl;
+	/**/
 }
 bool TLV::operator== (TLV& tlv)
 {
@@ -108,7 +117,7 @@ unsigned short TLV::getShort(unsigned short offset)
 
 unsigned long TLV::getLong(unsigned short offset)
 {
-	unsigned short output = 0;
+	unsigned long output = 0;
 	if ((offset + 4) <= (unsigned short)v.size())                // If valid offset
 	{
 		output = v[offset];
@@ -120,7 +129,7 @@ unsigned long TLV::getLong(unsigned short offset)
 
 unsigned long long TLV::getAddr(unsigned short offset)
 {
-	unsigned short output = 0;
+	unsigned long long output = 0;
 	if ((offset + 6) <= (unsigned short)v.size())                // If valid offset
 	{
 		output = v[offset];
@@ -132,7 +141,7 @@ unsigned long long TLV::getAddr(unsigned short offset)
 
 unsigned long long TLV::getLongLong(unsigned short offset)
 {
-	unsigned short output = 0;
+	unsigned long long output = 0;
 	if ((offset + 8) <= (unsigned short)v.size())                // If valid offset
 	{
 		output = v[offset];
@@ -156,7 +165,7 @@ std::string TLV::getString(unsigned short offset, unsigned short length)
 bool TLV::putChar(unsigned short offset, unsigned char input)
 {
 	bool success = false;
-	if ((offset > 1) && ((offset + 2) <= (unsigned short)v.size()))   // If valid offset
+	if ((offset > 1) && ((offset + 1) <= (unsigned short)v.size()))   // If valid offset
 	{
 		v[offset] = input;                                            //    store data
 		success = true;
@@ -333,8 +342,9 @@ tlvManifest::tlvManifest(unsigned long long returnAddr, unsigned char numXpdus, 
 	putAddr(2, returnAddr);
 	puttotalSize(size);
 	putChar(11, numXpdus);
-	SimLog::logFile << "Creating manifest TLV with " << (unsigned short)numXpdus << " XPDUs and total size = "
-		<< size << " and TLV length = " << v.size() - 2 << endl;
+	SimLog::logFile << "Creating manifest TLV with return " << hex << returnAddr << dec << " : "
+		<< (unsigned short)numXpdus << " XPDUs, total size = "
+		<< size << ", TLV length = " << v.size() - 2 << endl;
 }
 
 tlvManifest::~tlvManifest()
@@ -399,43 +409,89 @@ bool tlvManifest::putXpduDescriptor(unsigned short position, xpduDescriptor desc
 	success &= putChar(index + 1, desc.rev);
 	success &= putLong(index + 2, desc.check);
 	return(success);
-
 }
 
 
 
 
-/*
+/**/
 
-tlvManifest::tlvManifest()
-	: TLV(TLVtypes::MANIFEST)
+tlvREQ::tlvREQ(unsigned long long returnAddr, unsigned long long scopeAddr, unsigned char xpduCount)
+	: TLV(TLVtypes::XREQ, 14 + 6 * xpduCount)
 {
-
-}
-
-tlvManifest::~tlvManifest()
-{
-}
-
-tlvREQ::tlvREQ()
-	: TLV(TLVtypes::XREQ)
-{
-
+	putAddr(2, returnAddr);
+	putAddr(8, scopeAddr);
+	putChar(14, 0);  // reserved
+	putChar(15, xpduCount);
 }
 
 tlvREQ::~tlvREQ()
 {
 }
 
-tlvXID::tlvXID()
-	: TLV(TLVtypes::XID)
+unsigned long long tlvREQ::getReturnAddr()
 {
+	return(getAddr(2));
+}
 
+unsigned long long tlvREQ::getScopeAddr()
+{
+	return(getAddr(8));
+}
+
+unsigned char tlvREQ::getNumXpdus()
+{
+	return(getChar(15));
+}
+
+xpduDescriptor tlvREQ::getXpduDescriptor(unsigned short position)
+{
+	unsigned short index = 16 + (position * 6);
+	xpduDescriptor desc;
+	desc.num = getChar(index);
+	desc.rev = getChar(index + 1);
+	desc.check = getLong(index + 2);
+	return(desc);
+}
+
+bool tlvREQ::putXpduDescriptor(unsigned short position, xpduDescriptor desc)
+{
+	unsigned short index = 16 + (position * 6);
+	bool success = putChar(index, desc.num);
+	success &= putChar(index + 1, desc.rev);
+	success &= putLong(index + 2, desc.check);
+	return(success);
+}
+
+
+tlvXID::tlvXID(unsigned long long scopeAddr, xpduDescriptor desc)
+	: TLV(TLVtypes::XID, 8)
+{
+	putAddr(2, scopeAddr);
+	putChar(8, desc.num);
+	putChar(9, desc.rev);
 }
 
 tlvXID::~tlvXID()
 {
 }
+
+unsigned long long tlvXID::getScopeAddr()
+{
+	return (getAddr(2));
+}
+
+xpduDescriptor tlvXID::getXpduDescriptor()
+{
+	xpduDescriptor output;
+	output.num = getChar(8);
+	output.rev = getChar(9);
+	output.check = 0;
+	return(output);
+}
+
+
+/*
 
 tlvOuiString::tlvOuiString(unsigned long OUItype)
 	: TLV(TLVtypes::ORG_SPECIFIC)
